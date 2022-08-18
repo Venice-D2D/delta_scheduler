@@ -26,4 +26,12 @@ void main() {
     }
     expect(lastChunk.data.length <= chunksize, true);
   });
+
+  test("should not split file with negative chunk size", () {
+    Scheduler scheduler = MockScheduler();
+    File file = File('test/assets/paper.pdf');
+    expect(() => scheduler.splitFile(file, -42),
+        throwsA(predicate((e) => e is RangeError
+            && e.message == 'Invalid chunk size (was -42).')));
+  });
 }
