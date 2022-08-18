@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:channel_multiplexed_scheduler/channels/channel_event.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 
 import '../channels/channel.dart';
@@ -21,6 +22,20 @@ abstract class Scheduler {
     }
 
     FileChunks chunks = splitFile(file, chunksize);
+
+    // initialize channels event listeners
+    for (var channel in channels) {
+      channel.on = (ChannelEvent event, dynamic data) {
+        switch (event) {
+          case ChannelEvent.acknowledgment:
+            // TODO: Handle this case.
+            break;
+          case ChannelEvent.opened:
+            // TODO: Handle this case.
+            break;
+        }
+      };
+    }
     
     // open all channels
     Future.wait(channels.map((c) => c.init()));
