@@ -22,6 +22,10 @@ abstract class Scheduler {
 
   // TODO comment
   FileChunks splitFile (File file, int chunksize) {
+    if (!file.existsSync()) {
+      throw RangeError('Invalid input file (path="${file.path}").');
+    }
+
     Uint8List bytes = file.readAsBytesSync();
     FileChunks chunks = {};
     int bytesCount = bytes.length;
