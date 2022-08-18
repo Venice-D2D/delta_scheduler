@@ -27,6 +27,10 @@ abstract class Scheduler {
     int bytesCount = bytes.length;
     int index = 0;
 
+    if (chunksize <= 0 || chunksize > bytesCount) {
+      throw RangeError('Invalid chunk size (was $chunksize).');
+    }
+
     for (int i=0; i<bytesCount; i += chunksize) {
       chunks.putIfAbsent(index, () => FileChunk(
           identifier: index,
