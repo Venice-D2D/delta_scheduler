@@ -8,7 +8,7 @@ import '../channels/channel.dart';
 typedef FileChunks = Map<int, FileChunk>;
 
 abstract class Scheduler {
-  late List<Channel> channels;
+  late final List<Channel> channels = [];
 
   /// Adds a channel to be used to send file chunks.
   void useChannel(Channel channel) {
