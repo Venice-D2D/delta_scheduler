@@ -42,4 +42,15 @@ void main() {
         throwsA(predicate((e) => e is RangeError
             && e.message == 'Invalid chunk size (was 0).')));
   });
+
+  test("should not split file with chunk size bigger than file size", () {
+    Scheduler scheduler = MockScheduler();
+    File file = File('test/assets/paper.pdf');
+    int filesize = file.lengthSync();
+    int chunksize = filesize + 42;
+
+    expect(() => scheduler.splitFile(file, chunksize),
+        throwsA(predicate((e) => e is RangeError
+            && e.message == 'Invalid chunk size (was $chunksize).')));
+  });
 }
