@@ -69,4 +69,13 @@ void main() {
               && e.message == 'Invalid input file (path="").')));
     });
   });
+
+
+  group('sendFile', () {
+    test('should throw when sending file with no channel', () {
+      expect(() async => await scheduler.sendFile(file, 100000),
+          throwsA(predicate((e) => e is RangeError
+              && e.message == 'Cannot send file because scheduler has no channel.')));
+    });
+  });
 }
