@@ -20,17 +20,30 @@ abstract class Scheduler {
     // TODO send
   }
 
-  // TODO comment
-  // TODO test
+  /// Divides an input file into chunks of *chunksize* size.
+  /// This will fail if input file is not accessible, or if input chunk size is
+  /// invalid.
   FileChunks splitFile (File file, int chunksize) {
+    if (!file.existsSync()) {
+      throw RangeError('Invalid input file (path="${file.path}").');
+    }
+
     Uint8List bytes = file.readAsBytesSync();
     FileChunks chunks = {};
-
+    int bytesCount = bytes.length;
     int index = 0;
-    int byteIndex = 0;
-    while (bytes.isNotEmpty) {
-      chunks.putIfAbsent(index, () => FileChunk(identifier: index, data: bytes.sublist(byteIndex, byteIndex+chunksize)));
-      byteIndex += chunksize;
+
+    if (chunksize <= 0 || chunksize > bytesCount) {
+      throw RangeError('Invalid chunk size (was $chunksize).');
+    }
+
+    for (int i=0; i<bytesCount; i += chunksize) {
+      chunks.putIfAbsent(index, () => FileChunk(
+          identifier: index,
+          data: bytes.sublist(i, i + chunksize > bytesCount
+              ? bytesCount
+              : i + chunksize)
+      ));
       index += 1;
     }
 
