@@ -16,13 +16,13 @@ abstract class Scheduler {
   }
 
   Future<void> sendFile(File file, int chunksize) async {
-    FileChunks chunks = _splitFile(file, chunksize);
+    FileChunks chunks = splitFile(file, chunksize);
     // TODO send
   }
 
   // TODO comment
   // TODO test
-  FileChunks _splitFile (File file, int chunksize) {
+  FileChunks splitFile (File file, int chunksize) {
     Uint8List bytes = file.readAsBytesSync();
     FileChunks chunks = {};
 
