@@ -39,6 +39,8 @@ abstract class Scheduler {
     
     // open all channels
     Future.wait(channels.map((c) => c.init()));
+
+    // TODO create a map { int => {chunk, timeout} }
   }
 
   /// Divides an input file into chunks of *chunksize* size.
