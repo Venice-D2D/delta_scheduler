@@ -19,9 +19,11 @@ abstract class Scheduler {
     if (channels.isEmpty) {
       throw StateError('Cannot send file because scheduler has no channel.');
     }
-    
+
     FileChunks chunks = splitFile(file, chunksize);
-    // TODO send
+    
+    // open all channels
+    Future.wait(channels.map((c) => c.init()));
   }
 
   /// Divides an input file into chunks of *chunksize* size.
