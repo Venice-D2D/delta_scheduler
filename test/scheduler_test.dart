@@ -61,4 +61,10 @@ void main() {
     FileChunks chunks = scheduler.splitFile(file, 1);
     expect(chunks.values.length, file.lengthSync());
   });
+
+  test("should throw with non-existing file", () {
+    expect(() => scheduler.splitFile(File(''), 1000),
+        throwsA(predicate((e) => e is RangeError
+            && e.message == 'Invalid input file (path="").')));
+  });
 }
