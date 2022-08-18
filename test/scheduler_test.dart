@@ -34,4 +34,12 @@ void main() {
         throwsA(predicate((e) => e is RangeError
             && e.message == 'Invalid chunk size (was -42).')));
   });
+
+  test("should not split file with empty chunk size", () {
+    Scheduler scheduler = MockScheduler();
+    File file = File('test/assets/paper.pdf');
+    expect(() => scheduler.splitFile(file, 0),
+        throwsA(predicate((e) => e is RangeError
+            && e.message == 'Invalid chunk size (was 0).')));
+  });
 }
