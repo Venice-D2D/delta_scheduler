@@ -21,16 +21,19 @@ abstract class Scheduler {
   }
 
   // TODO comment
-  // TODO test
   FileChunks splitFile (File file, int chunksize) {
     Uint8List bytes = file.readAsBytesSync();
     FileChunks chunks = {};
-
+    int bytesCount = bytes.length;
     int index = 0;
-    int byteIndex = 0;
-    while (bytes.isNotEmpty) {
-      chunks.putIfAbsent(index, () => FileChunk(identifier: index, data: bytes.sublist(byteIndex, byteIndex+chunksize)));
-      byteIndex += chunksize;
+
+    for (int i=0; i<bytesCount; i += chunksize) {
+      chunks.putIfAbsent(index, () => FileChunk(
+          identifier: index,
+          data: bytes.sublist(i, i + chunksize > bytesCount
+              ? bytesCount
+              : i + chunksize)
+      ));
       index += 1;
     }
 
