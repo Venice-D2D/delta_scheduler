@@ -20,7 +20,9 @@ abstract class Scheduler {
     // TODO send
   }
 
-  // TODO comment
+  /// Divides an input file into chunks of *chunksize* size.
+  /// This will fail if input file is not accessible, or if input chunk size is
+  /// invalid.
   FileChunks splitFile (File file, int chunksize) {
     if (!file.existsSync()) {
       throw RangeError('Invalid input file (path="${file.path}").');
