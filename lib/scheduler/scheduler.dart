@@ -16,6 +16,10 @@ abstract class Scheduler {
   }
 
   Future<void> sendFile(File file, int chunksize) async {
+    if (channels.isEmpty) {
+      throw StateError('Cannot send file because scheduler has no channel.');
+    }
+    
     FileChunks chunks = splitFile(file, chunksize);
     // TODO send
   }
