@@ -7,11 +7,21 @@ import 'package:flutter_test/flutter_test.dart';
 class MockScheduler extends Scheduler {}
 
 void main() {
+  late File file;
+  late int fileLength;
+  late Scheduler scheduler;
+
+  setUpAll(() {
+    file = File('test/assets/paper.pdf');
+    fileLength = file.lengthSync();
+  });
+  setUp(() {
+    scheduler = MockScheduler();
+  });
+
+
   test("should split file into chunks", () {
-    Scheduler scheduler = MockScheduler();
-    File file = File('test/assets/paper.pdf');
     int chunksize = 1000;
-    int fileLength = file.lengthSync();
     
     FileChunks chunks = scheduler.splitFile(file, chunksize);
     expect(chunks.length, (fileLength/chunksize).ceil());
@@ -28,26 +38,19 @@ void main() {
   });
 
   test("should not split file with negative chunk size", () {
-    Scheduler scheduler = MockScheduler();
-    File file = File('test/assets/paper.pdf');
     expect(() => scheduler.splitFile(file, -42),
         throwsA(predicate((e) => e is RangeError
             && e.message == 'Invalid chunk size (was -42).')));
   });
 
   test("should not split file with empty chunk size", () {
-    Scheduler scheduler = MockScheduler();
-    File file = File('test/assets/paper.pdf');
     expect(() => scheduler.splitFile(file, 0),
         throwsA(predicate((e) => e is RangeError
             && e.message == 'Invalid chunk size (was 0).')));
   });
 
   test("should not split file with chunk size bigger than file size", () {
-    Scheduler scheduler = MockScheduler();
-    File file = File('test/assets/paper.pdf');
-    int filesize = file.lengthSync();
-    int chunksize = filesize + 42;
+    int chunksize = fileLength + 42;
 
     expect(() => scheduler.splitFile(file, chunksize),
         throwsA(predicate((e) => e is RangeError
@@ -55,8 +58,6 @@ void main() {
   });
 
   test("should split file in as many chunks as file bytes", () {
-    Scheduler scheduler = MockScheduler();
-    File file = File('test/assets/paper.pdf');
     FileChunks chunks = scheduler.splitFile(file, 1);
     expect(chunks.values.length, file.lengthSync());
   });
