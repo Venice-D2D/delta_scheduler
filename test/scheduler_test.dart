@@ -53,4 +53,11 @@ void main() {
         throwsA(predicate((e) => e is RangeError
             && e.message == 'Invalid chunk size (was $chunksize).')));
   });
+
+  test("should split file in as many chunks as file bytes", () {
+    Scheduler scheduler = MockScheduler();
+    File file = File('test/assets/paper.pdf');
+    FileChunks chunks = scheduler.splitFile(file, 1);
+    expect(chunks.values.length, file.lengthSync());
+  });
 }
