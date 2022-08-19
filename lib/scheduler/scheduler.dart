@@ -17,6 +17,17 @@ abstract class Scheduler {
   /// Adds a channel to be used to send file chunks.
   void useChannel(Channel channel) {
     channels.add(channel);
+    channel.on = (ChannelEvent event, dynamic data) {
+      switch (event) {
+        case ChannelEvent.acknowledgment:
+          int chunkId = data;
+          CancelableOperation timer = resubmissionTimers.remove(chunkId)!;
+          timer.cancel();
+          break;
+        case ChannelEvent.opened:
+          break;
+      }
+    };
   }
 
   /// Sends file chunks through available channels.
@@ -32,22 +43,6 @@ abstract class Scheduler {
     }
 
     chunksQueue = splitFile(file, chunksize);
-
-    // initialize channels event listeners
-    for (var channel in channels) {
-      channel.on = (ChannelEvent event, dynamic data) {
-        switch (event) {
-          case ChannelEvent.acknowledgment:
-            int chunkId = data;
-            CancelableOperation timer = resubmissionTimers.remove(chunkId)!;
-            timer.cancel();
-            break;
-          case ChannelEvent.opened:
-            // TODO: Handle this case.
-            break;
-        }
-      };
-    }
     
     // Open all channels.
     Future.wait(channels.map((c) => c.init()));
