@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:math';
 
 import 'package:async/src/cancelable_operation.dart';
 import 'package:channel_multiplexed_scheduler/channels/channel.dart';
@@ -12,11 +13,11 @@ class MockScheduler extends Scheduler {
   // Stupid dummy implementation using only one channel.
   @override
   Future<void> sendChunks(List<FileChunk> chunks, Map<int, CancelableOperation> resubmissionTimers) async {
-    while (chunksQueue.isNotEmpty || resubmissionTimers.isNotEmpty) {
-      if (chunksQueue.isEmpty) {
-        sleep(const Duration(milliseconds: 200));
+    while (chunks.isNotEmpty || resubmissionTimers.isNotEmpty) {
+      if (chunks.isEmpty) {
+        await Future.delayed(const Duration(milliseconds: 200));
       } else {
-        sendChunk(chunksQueue.removeAt(0), channels[0]);
+        sendChunk(chunks.removeAt(0), channels[0]);
       }
     }
 
@@ -36,7 +37,9 @@ class MockChannel extends Channel {
   @override
   Future<void> sendChunk(FileChunk chunk) async {
     sentChunksIds.add(chunk.identifier);
-    on(ChannelEvent.acknowledgment, chunk.identifier);
+    await Future.delayed(Duration(milliseconds: Random().nextInt(2000)), () {
+      on(ChannelEvent.acknowledgment, chunk.identifier);
+    });
   }
 }
 
