@@ -57,20 +57,22 @@ abstract class Scheduler {
       if (chunksQueue.isEmpty) {
         sleep(const Duration(milliseconds: 200));
       } else {
-        FileChunk toSend = chunksQueue.removeAt(0);
-        channels[0].sendChunk(toSend);
-
-        resubmissionTimers.putIfAbsent(
-            toSend.identifier,
-            () => CancelableOperation.fromFuture(
-                Future.delayed(const Duration(seconds: 1), () {
-                  resubmissionTimers.remove(toSend.identifier);
-                  chunksQueue.insert(0, toSend);
-                })
-            )
-        );
+        sendChunk(chunksQueue.removeAt(0), channels[0]);
       }
     }
+  }
+
+  void sendChunk(FileChunk chunk, Channel channel) {
+    channel.sendChunk(chunk);
+    resubmissionTimers.putIfAbsent(
+        chunk.identifier,
+            () => CancelableOperation.fromFuture(
+            Future.delayed(const Duration(seconds: 1), () {
+              resubmissionTimers.remove(chunk.identifier);
+              chunksQueue.insert(0, chunk);
+            })
+        )
+    );
   }
 
   /// Divides an input file into chunks of *chunksize* size.
