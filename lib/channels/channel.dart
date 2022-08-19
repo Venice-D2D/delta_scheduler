@@ -6,8 +6,7 @@ typedef ChannelCallback = Function(ChannelEvent even, dynamic data);
 abstract class Channel {
   /// Provides information to the scheduler about what's happening in the
   /// current channel.
-  ChannelCallback on;
-  Channel({required this.on});
+  late ChannelCallback on;
 
   /// Initializes current channel, and returns when it is ready to send data.
   Future<void> init();

@@ -21,7 +21,6 @@ class MockScheduler extends Scheduler {
 }
 
 class MockChannel extends Channel {
-  MockChannel({required super.on});
   bool isInit = false;
   List<int> sentChunksIds = [];
 
@@ -107,8 +106,8 @@ void main() {
     });
 
     test('should init channels', () async {
-      MockChannel channel1 = MockChannel(on: (event, data){});
-      MockChannel channel2 = MockChannel(on: (event, data){});
+      MockChannel channel1 = MockChannel();
+      MockChannel channel2 = MockChannel();
       scheduler.useChannel(channel1);
       scheduler.useChannel(channel2);
 
