@@ -59,7 +59,6 @@ abstract class Scheduler {
   Future<void> sendChunks(List<FileChunk> chunks, Map<int, CancelableOperation> resubmissionTimers);
 
   void sendChunk(FileChunk chunk, Channel channel) {
-    channel.sendChunk(chunk);
     resubmissionTimers.putIfAbsent(
         chunk.identifier,
             () => CancelableOperation.fromFuture(
@@ -69,6 +68,7 @@ abstract class Scheduler {
             })
         )
     );
+    channel.sendChunk(chunk);
   }
 
   /// Divides an input file into chunks of *chunksize* size.
