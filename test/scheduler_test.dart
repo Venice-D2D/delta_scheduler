@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:async/src/cancelable_operation.dart';
 import 'package:channel_multiplexed_scheduler/channels/channel.dart';
+import 'package:channel_multiplexed_scheduler/channels/channel_event.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 import 'package:channel_multiplexed_scheduler/scheduler/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -32,6 +33,7 @@ class MockChannel extends Channel {
   @override
   void sendChunk(FileChunk chunk) {
     sentChunksIds.add(chunk.identifier);
+    on(ChannelEvent.acknowledgment, chunk.identifier);
   }
 }
 
