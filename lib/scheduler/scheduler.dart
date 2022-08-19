@@ -9,6 +9,7 @@ import '../channels/channel.dart';
 
 abstract class Scheduler {
   late final List<Channel> channels = [];
+  late List<FileChunk> chunksQueue = [];
 
   /// Adds a channel to be used to send file chunks.
   void useChannel(Channel channel) {
@@ -20,7 +21,7 @@ abstract class Scheduler {
       throw StateError('Cannot send file because scheduler has no channel.');
     }
 
-    List<FileChunk> chunks = splitFile(file, chunksize);
+    chunksQueue = splitFile(file, chunksize);
 
     // initialize channels event listeners
     for (var channel in channels) {
