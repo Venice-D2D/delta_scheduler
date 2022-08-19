@@ -19,6 +19,13 @@ abstract class Scheduler {
     channels.add(channel);
   }
 
+  /// Sends file chunks through available channels.
+  ///
+  /// While there are chunks to send, it unstacks them one by one, and choose
+  /// a channel to send them.
+  ///
+  /// When sending a chunk, this registers a timeout callback, that triggers
+  /// resending chunk if channel didn't send an acknowledgement.
   Future<void> sendFile(File file, int chunksize) async {
     if (channels.isEmpty) {
       throw StateError('Cannot send file because scheduler has no channel.');
