@@ -40,8 +40,31 @@ abstract class Scheduler {
       };
     }
     
-    // open all channels
+    // Open all channels.
     Future.wait(channels.map((c) => c.init()));
+
+    // Stupid dummy implementation using only one channel.
+    while (chunksQueue.isNotEmpty || sendState.isNotEmpty) {
+      if (chunksQueue.isEmpty) {
+        sleep(const Duration(milliseconds: 200));
+      } else {
+        FileChunk toSend = chunksQueue.removeAt(0);
+        channels[0].sendChunk(toSend);
+
+        sendState.putIfAbsent(
+            toSend.identifier,
+            () => FileChunkSendState(
+                data: toSend,
+
+                // Resend timeout.
+                timer: Future.delayed(const Duration(seconds: 1), () {
+                  sendState.remove(toSend.identifier);
+                  chunksQueue.insert(0, toSend);
+                })
+            )
+        );
+      }
+    }
   }
 
   /// Divides an input file into chunks of *chunksize* size.
