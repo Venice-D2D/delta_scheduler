@@ -22,9 +22,11 @@ abstract class Scheduler {
       switch (event) {
         case ChannelEvent.acknowledgment:
           int chunkId = data;
-          debugPrint('[Scheduler] Received ACK for chunk n°$chunkId.');
-          CancelableOperation timer = resubmissionTimers.remove(chunkId)!;
-          timer.cancel();
+          if (resubmissionTimers.containsKey(chunkId)) {
+            debugPrint('[Scheduler] Received ACK for chunk n°$chunkId.');
+            CancelableOperation timer = resubmissionTimers.remove(chunkId)!;
+            timer.cancel();
+          }
           break;
         case ChannelEvent.opened:
           break;
@@ -60,7 +62,10 @@ abstract class Scheduler {
         chunk.identifier,
             () => CancelableOperation.fromFuture(
             Future.delayed(const Duration(seconds: 1), () {
-              resubmissionTimers.remove(chunk.identifier);
+
+              debugPrint("[Scheduler] Chunk n°${chunk.identifier} was not acknowledged in time, resending.");
+              CancelableOperation timer = resubmissionTimers.remove(chunk.identifier)!;
+              timer.cancel();
               chunksQueue.insert(0, chunk);
             })
         )
