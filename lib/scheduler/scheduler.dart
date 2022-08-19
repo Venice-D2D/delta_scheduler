@@ -1,8 +1,10 @@
+import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:channel_multiplexed_scheduler/channels/channel_event.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
+import 'package:channel_multiplexed_scheduler/scheduler/file_chunk_send_state.dart';
 
 import '../channels/channel.dart';
 
@@ -10,6 +12,7 @@ import '../channels/channel.dart';
 abstract class Scheduler {
   late final List<Channel> channels = [];
   late List<FileChunk> chunksQueue = [];
+  final Map<int, FileChunkSendState> sendState = {};
 
   /// Adds a channel to be used to send file chunks.
   void useChannel(Channel channel) {
@@ -39,8 +42,6 @@ abstract class Scheduler {
     
     // open all channels
     Future.wait(channels.map((c) => c.init()));
-
-    // TODO create a map { int => {chunk, timeout} }
   }
 
   /// Divides an input file into chunks of *chunksize* size.
