@@ -52,15 +52,11 @@ abstract class Scheduler {
     // Open all channels.
     Future.wait(channels.map((c) => c.init()));
 
-    // Stupid dummy implementation using only one channel.
-    while (chunksQueue.isNotEmpty || resubmissionTimers.isNotEmpty) {
-      if (chunksQueue.isEmpty) {
-        sleep(const Duration(milliseconds: 200));
-      } else {
-        sendChunk(chunksQueue.removeAt(0), channels[0]);
-      }
-    }
+    // Begin sending chunks.
+    sendChunks(chunksQueue, resubmissionTimers);
   }
+
+  Future<void> sendChunks(List<FileChunk> chunks, Map<int, CancelableOperation> resubmissionTimers);
 
   void sendChunk(FileChunk chunk, Channel channel) {
     channel.sendChunk(chunk);

@@ -1,10 +1,23 @@
 import 'dart:io';
 
+import 'package:async/src/cancelable_operation.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 import 'package:channel_multiplexed_scheduler/scheduler/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-class MockScheduler extends Scheduler {}
+class MockScheduler extends Scheduler {
+  // Stupid dummy implementation using only one channel.
+  @override
+  Future<void> sendChunks(List<FileChunk> chunks, Map<int, CancelableOperation> resubmissionTimers) async {
+    while (chunksQueue.isNotEmpty || resubmissionTimers.isNotEmpty) {
+      if (chunksQueue.isEmpty) {
+        sleep(const Duration(milliseconds: 200));
+      } else {
+        sendChunk(chunksQueue.removeAt(0), channels[0]);
+      }
+    }
+  }
+}
 
 void main() {
   late File file;
