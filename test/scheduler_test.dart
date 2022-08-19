@@ -36,8 +36,10 @@ class MockChannel extends Channel {
 
   @override
   Future<void> sendChunk(FileChunk chunk) async {
-    sentChunksIds.add(chunk.identifier);
     await Future.delayed(Duration(milliseconds: Random().nextInt(2000)), () {
+      if (!sentChunksIds.contains(chunk.identifier)) {
+        sentChunksIds.add(chunk.identifier);
+      }
       on(ChannelEvent.acknowledgment, chunk.identifier);
     });
   }
