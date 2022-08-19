@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:async/async.dart';
 import 'package:channel_multiplexed_scheduler/channels/channel_event.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 import 'package:channel_multiplexed_scheduler/scheduler/file_chunk_send_state.dart';
@@ -38,7 +39,9 @@ abstract class Scheduler {
       channel.on = (ChannelEvent event, dynamic data) {
         switch (event) {
           case ChannelEvent.acknowledgment:
-            // TODO: Handle this case.
+            int chunkId = data;
+            FileChunkSendState result = sendState.remove(chunkId)!;
+            result.resubmissionTimer.cancel();
             break;
           case ChannelEvent.opened:
             // TODO: Handle this case.
@@ -64,10 +67,12 @@ abstract class Scheduler {
                 data: toSend,
 
                 // Resend timeout.
-                timer: Future.delayed(const Duration(seconds: 1), () {
-                  sendState.remove(toSend.identifier);
-                  chunksQueue.insert(0, toSend);
-                })
+                resubmissionTimer: CancelableOperation.fromFuture(
+                    Future.delayed(const Duration(seconds: 1), () {
+                      sendState.remove(toSend.identifier);
+                      chunksQueue.insert(0, toSend);
+                    })
+                )
             )
         );
       }
