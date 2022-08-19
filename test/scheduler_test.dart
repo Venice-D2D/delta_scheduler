@@ -23,16 +23,14 @@ void main() {
   group('splitFile', () {
     test("should split file into chunks", () {
       int chunksize = 1000;
-      
-      FileChunks chunks = scheduler.splitFile(file, chunksize);
-      expect(chunks.length, (fileLength/chunksize).ceil());
 
-      List<FileChunk> chunksList = chunks.values.toList();
-      FileChunk lastChunk = chunksList.removeLast();
+      List<FileChunk> chunks = scheduler.splitFile(file, chunksize);
+      expect(chunks.length, (fileLength/chunksize).ceil());
+      FileChunk lastChunk = chunks.removeLast();
 
       // all chunks should have same size,
       // except the last one which might be smaller
-      for (var chunk in chunksList) {
+      for (var chunk in chunks) {
         expect(chunk.data.length, chunksize);
       }
       expect(lastChunk.data.length <= chunksize, true);
@@ -59,8 +57,8 @@ void main() {
     });
 
     test("should split file in as many chunks as file bytes", () {
-      FileChunks chunks = scheduler.splitFile(file, 1);
-      expect(chunks.values.length, file.lengthSync());
+      List<FileChunk> chunks = scheduler.splitFile(file, 1);
+      expect(chunks.length, file.lengthSync());
     });
 
     test("should throw with non-existing file", () {
