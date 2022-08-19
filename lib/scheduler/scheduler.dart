@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:async/async.dart';
 import 'package:channel_multiplexed_scheduler/channels/channel_event.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
+import 'package:flutter/material.dart';
 
 import '../channels/channel.dart';
 
@@ -21,6 +22,7 @@ abstract class Scheduler {
       switch (event) {
         case ChannelEvent.acknowledgment:
           int chunkId = data;
+          debugPrint('[Scheduler] Received ACK for chunk n°$chunkId.');
           CancelableOperation timer = resubmissionTimers.remove(chunkId)!;
           timer.cancel();
           break;
@@ -63,6 +65,7 @@ abstract class Scheduler {
             })
         )
     );
+    debugPrint("[Scheduler] Sending chunk n°${chunk.identifier}.");
     channel.sendChunk(chunk);
   }
 
