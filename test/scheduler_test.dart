@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:async/src/cancelable_operation.dart';
+import 'package:channel_multiplexed_scheduler/channels/channel.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 import 'package:channel_multiplexed_scheduler/scheduler/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -16,6 +17,22 @@ class MockScheduler extends Scheduler {
         sendChunk(chunksQueue.removeAt(0), channels[0]);
       }
     }
+  }
+}
+
+class MockChannel extends Channel {
+  MockChannel({required super.on});
+  bool isInit = false;
+  List<int> sentChunksIds = [];
+
+  @override
+  Future<void> init() async {
+    isInit = true;
+  }
+
+  @override
+  void sendChunk(FileChunk chunk) {
+    sentChunksIds.add(chunk.identifier);
   }
 }
 
@@ -87,6 +104,18 @@ void main() {
       expect(() async => await scheduler.sendFile(file, 100000),
           throwsA(predicate((e) => e is StateError
               && e.message == 'Cannot send file because scheduler has no channel.')));
+    });
+
+    test('should init channels', () async {
+      MockChannel channel1 = MockChannel(on: (event, data){});
+      MockChannel channel2 = MockChannel(on: (event, data){});
+      scheduler.useChannel(channel1);
+      scheduler.useChannel(channel2);
+
+      await scheduler.sendFile(file, 100000);
+
+      expect(channel1.isInit, true);
+      expect(channel2.isInit, true);
     });
   });
 }
