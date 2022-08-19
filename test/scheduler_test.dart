@@ -5,6 +5,7 @@ import 'package:channel_multiplexed_scheduler/channels/channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/channel_event.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 import 'package:channel_multiplexed_scheduler/scheduler/scheduler.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 class MockScheduler extends Scheduler {
@@ -18,6 +19,8 @@ class MockScheduler extends Scheduler {
         sendChunk(chunksQueue.removeAt(0), channels[0]);
       }
     }
+
+    debugPrint('[Scheduler] Finished dispatching all chunks to channels.');
   }
 }
 
@@ -31,7 +34,7 @@ class MockChannel extends Channel {
   }
 
   @override
-  void sendChunk(FileChunk chunk) {
+  Future<void> sendChunk(FileChunk chunk) async {
     sentChunksIds.add(chunk.identifier);
     on(ChannelEvent.acknowledgment, chunk.identifier);
   }

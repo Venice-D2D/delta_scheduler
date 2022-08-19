@@ -13,5 +13,5 @@ abstract class Channel {
 
   /// Sends a file piece through current channel, and returns after successful
   /// sending; this doesn't check if chunk was received.
-  void sendChunk(FileChunk chunk);
+  Future<void> sendChunk(FileChunk chunk);
 }
