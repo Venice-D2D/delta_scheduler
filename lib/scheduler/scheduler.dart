@@ -5,7 +5,6 @@ import 'dart:typed_data';
 import 'package:async/async.dart';
 import 'package:channel_multiplexed_scheduler/channels/channel_event.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
-import 'package:channel_multiplexed_scheduler/scheduler/file_chunk_send_state.dart';
 
 import '../channels/channel.dart';
 
@@ -13,7 +12,7 @@ import '../channels/channel.dart';
 abstract class Scheduler {
   late final List<Channel> channels = [];
   late List<FileChunk> chunksQueue = [];
-  final Map<int, FileChunkSendState> sendState = {};
+  final Map<int, CancelableOperation> resubmissionTimers = {};
 
   /// Adds a channel to be used to send file chunks.
   void useChannel(Channel channel) {
@@ -40,8 +39,8 @@ abstract class Scheduler {
         switch (event) {
           case ChannelEvent.acknowledgment:
             int chunkId = data;
-            FileChunkSendState result = sendState.remove(chunkId)!;
-            result.resubmissionTimer.cancel();
+            CancelableOperation timer = resubmissionTimers.remove(chunkId)!;
+            timer.cancel();
             break;
           case ChannelEvent.opened:
             // TODO: Handle this case.
@@ -54,25 +53,20 @@ abstract class Scheduler {
     Future.wait(channels.map((c) => c.init()));
 
     // Stupid dummy implementation using only one channel.
-    while (chunksQueue.isNotEmpty || sendState.isNotEmpty) {
+    while (chunksQueue.isNotEmpty || resubmissionTimers.isNotEmpty) {
       if (chunksQueue.isEmpty) {
         sleep(const Duration(milliseconds: 200));
       } else {
         FileChunk toSend = chunksQueue.removeAt(0);
         channels[0].sendChunk(toSend);
 
-        sendState.putIfAbsent(
+        resubmissionTimers.putIfAbsent(
             toSend.identifier,
-            () => FileChunkSendState(
-                data: toSend,
-
-                // Resend timeout.
-                resubmissionTimer: CancelableOperation.fromFuture(
-                    Future.delayed(const Duration(seconds: 1), () {
-                      sendState.remove(toSend.identifier);
-                      chunksQueue.insert(0, toSend);
-                    })
-                )
+            () => CancelableOperation.fromFuture(
+                Future.delayed(const Duration(seconds: 1), () {
+                  resubmissionTimers.remove(toSend.identifier);
+                  chunksQueue.insert(0, toSend);
+                })
             )
         );
       }
