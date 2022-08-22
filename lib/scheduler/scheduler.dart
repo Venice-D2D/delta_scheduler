@@ -55,8 +55,18 @@ abstract class Scheduler {
     await sendChunks(chunksQueue, resubmissionTimers);
   }
 
+  /// This lets Scheduler instances implement their own chunks sending policy.
+  /// 
+  /// The implementation should send all chunks' content, by calling the 
+  /// sendChunk method; it can also check for any resubmission timer presence, 
+  /// to avoid finishing execution while some chunks have not been acknowledged.
   Future<void> sendChunks(List<FileChunk> chunks, Map<int, CancelableOperation> resubmissionTimers);
 
+  /// Sends a data chunk through a specified channel.
+  /// 
+  /// If such chunk is not acknowledged within a given duration, this will put
+  /// the chunk at the head of the sending queue, for it to be resent as soon
+  /// as possible.
   Future<void> sendChunk(FileChunk chunk, Channel channel) async {
     resubmissionTimers.putIfAbsent(
         chunk.identifier,
