@@ -23,7 +23,6 @@ abstract class Scheduler {
         case ChannelEvent.acknowledgment:
           int chunkId = data;
           if (_resubmissionTimers.containsKey(chunkId)) {
-            debugPrint('[Scheduler] Received ACK for chunk n°$chunkId.');
             CancelableOperation timer = _resubmissionTimers.remove(chunkId)!;
             timer.cancel();
           }
@@ -71,18 +70,32 @@ abstract class Scheduler {
   /// the chunk at the head of the sending queue, for it to be resent as soon
   /// as possible.
   Future<void> sendChunk(FileChunk chunk, Channel channel) async {
+    bool acknowledged = false;
+    bool timedOut = false;
+
     _resubmissionTimers.putIfAbsent(
         chunk.identifier,
             () => CancelableOperation.fromFuture(
             Future.delayed(const Duration(seconds: 1), () {
-
+              // Do not trigger chunk resending if it was previously
+              // acknowledged.
+              if (acknowledged) return;
               debugPrint("[Scheduler] Chunk n°${chunk.identifier} was not acknowledged in time, resending.");
               CancelableOperation timer = _resubmissionTimers.remove(chunk.identifier)!;
+              timedOut = true;
               timer.cancel();
               _chunksQueue.insert(0, chunk);
-            })
+            }),
+              onCancel: () {
+                // Do not print message if onCancel was called due to request
+                // timeout.
+                if (timedOut) return;
+                acknowledged = true;
+                debugPrint('[Scheduler] Chunk n°${chunk.identifier} was acknowledged.');
+              }
         )
     );
+
     debugPrint("[Scheduler] Sending chunk n°${chunk.identifier}.");
     await channel.sendChunk(chunk);
   }
