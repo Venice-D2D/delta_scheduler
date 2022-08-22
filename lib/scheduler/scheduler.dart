@@ -11,20 +11,20 @@ import '../channels/channel.dart';
 
 
 abstract class Scheduler {
-  late final List<Channel> channels = [];
-  late List<FileChunk> chunksQueue = [];
-  final Map<int, CancelableOperation> resubmissionTimers = {};
+  late final List<Channel> _channels = [];
+  late List<FileChunk> _chunksQueue = [];
+  final Map<int, CancelableOperation> _resubmissionTimers = {};
 
   /// Adds a channel to be used to send file chunks.
   void useChannel(Channel channel) {
-    channels.add(channel);
+    _channels.add(channel);
     channel.on = (ChannelEvent event, dynamic data) {
       switch (event) {
         case ChannelEvent.acknowledgment:
           int chunkId = data;
-          if (resubmissionTimers.containsKey(chunkId)) {
+          if (_resubmissionTimers.containsKey(chunkId)) {
             debugPrint('[Scheduler] Received ACK for chunk n°$chunkId.');
-            CancelableOperation timer = resubmissionTimers.remove(chunkId)!;
+            CancelableOperation timer = _resubmissionTimers.remove(chunkId)!;
             timer.cancel();
           }
           break;
@@ -42,17 +42,17 @@ abstract class Scheduler {
   /// When sending a chunk, this registers a timeout callback, that triggers
   /// resending chunk if channel didn't send an acknowledgement.
   Future<void> sendFile(File file, int chunksize) async {
-    if (channels.isEmpty) {
+    if (_channels.isEmpty) {
       throw StateError('Cannot send file because scheduler has no channel.');
     }
 
-    chunksQueue = splitFile(file, chunksize);
+    _chunksQueue = splitFile(file, chunksize);
     
     // Open all channels.
-    Future.wait(channels.map((c) => c.init()));
+    Future.wait(_channels.map((c) => c.init()));
 
     // Begin sending chunks.
-    await sendChunks(chunksQueue, resubmissionTimers);
+    await sendChunks(_chunksQueue, _channels, _resubmissionTimers);
   }
 
   /// This lets Scheduler instances implement their own chunks sending policy.
@@ -60,7 +60,10 @@ abstract class Scheduler {
   /// The implementation should send all chunks' content, by calling the 
   /// sendChunk method; it can also check for any resubmission timer presence, 
   /// to avoid finishing execution while some chunks have not been acknowledged.
-  Future<void> sendChunks(List<FileChunk> chunks, Map<int, CancelableOperation> resubmissionTimers);
+  Future<void> sendChunks(
+      List<FileChunk> chunks,
+      List<Channel> channels,
+      Map<int, CancelableOperation> resubmissionTimers);
 
   /// Sends a data chunk through a specified channel.
   /// 
@@ -68,15 +71,15 @@ abstract class Scheduler {
   /// the chunk at the head of the sending queue, for it to be resent as soon
   /// as possible.
   Future<void> sendChunk(FileChunk chunk, Channel channel) async {
-    resubmissionTimers.putIfAbsent(
+    _resubmissionTimers.putIfAbsent(
         chunk.identifier,
             () => CancelableOperation.fromFuture(
             Future.delayed(const Duration(seconds: 1), () {
 
               debugPrint("[Scheduler] Chunk n°${chunk.identifier} was not acknowledged in time, resending.");
-              CancelableOperation timer = resubmissionTimers.remove(chunk.identifier)!;
+              CancelableOperation timer = _resubmissionTimers.remove(chunk.identifier)!;
               timer.cancel();
-              chunksQueue.insert(0, chunk);
+              _chunksQueue.insert(0, chunk);
             })
         )
     );

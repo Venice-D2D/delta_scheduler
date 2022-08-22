@@ -12,7 +12,7 @@ import 'package:flutter_test/flutter_test.dart';
 class MockScheduler extends Scheduler {
   // Stupid dummy implementation using only one channel.
   @override
-  Future<void> sendChunks(List<FileChunk> chunks, Map<int, CancelableOperation> resubmissionTimers) async {
+  Future<void> sendChunks(List<FileChunk> chunks, List<Channel> channels, Map<int, CancelableOperation> resubmissionTimers) async {
     while (chunks.isNotEmpty || resubmissionTimers.isNotEmpty) {
       if (chunks.isEmpty) {
         await Future.delayed(const Duration(milliseconds: 200));
