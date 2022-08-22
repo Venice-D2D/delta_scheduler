@@ -13,7 +13,7 @@ Data exchanges do work as follow:
 
 **A scheduler sends a file as chunks going through multiple channels.**
 
-It uses the (selective repeat ARQ)[https://www.tutorialspoint.com/what-is-selective-repeat-arq-in-computer-networks]
+It uses the [selective repeat ARQ](https://www.tutorialspoint.com/what-is-selective-repeat-arq-in-computer-networks)
 technique by sending file chunks in different channels, and retrying if a chunk isn't acknowledged
 by sending channel in a given time.
 
@@ -28,8 +28,8 @@ This package provides a arbitrary-abstract `Channel` interface for other package
 idea being that you can implement a channel with whatever you want: Wi-Fi, Bluetooth... 
 
 Any wireless technology able to carry data in a wireless fashion can be implemented into a channel!
-Yeah, (even sound)[https://developers.google.com/android/reference/com/google/android/gms/nearby/messages/audio/AudioBytes]
-(don't try this at home)!
+Yeah, [even sound](https://developers.google.com/android/reference/com/google/android/gms/nearby/messages/audio/AudioBytes)!
+(don't try this at home)
 
 
 ## Getting Started
