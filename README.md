@@ -1,17 +1,46 @@
 # channel_multiplexed_scheduler
 
-A new Flutter plugin project.
+This project aims at providing a unified abstract interface to exchange data between devices using
+different wireless technologies.
+
+Data exchanges do work as follow:
+* File exchange is done between a sender and a receiver;
+* Multiple (one or several) channels link sender and receiver;
+* Sender-side, a scheduler sends file chunks on channels as it sees fit;
+* Receiver-side, an aggregator reconstructs file from received file chunks.
+
+#### Scheduler
+
+**A scheduler sends a file as chunks going through multiple channels.**
+
+It uses the (selective repeat ARQ)[https://www.tutorialspoint.com/what-is-selective-repeat-arq-in-computer-networks]
+technique by sending file chunks in different channels, and retrying if a chunk isn't acknowledged
+by sending channel in a given time.
+
+This package provides a `Scheduler` abstract class that must be implemented with the 
+channel-selection policy of your choice.
+
+#### Channels
+
+**A channel is charged with transmitting data from sender to receiver. That's it!**
+
+This package provides a arbitrary-abstract `Channel` interface for other packages to implement, the 
+idea being that you can implement a channel with whatever you want: Wi-Fi, Bluetooth... 
+
+Any wireless technology able to carry data in a wireless fashion can be implemented into a channel!
+Yeah, (even sound)[https://developers.google.com/android/reference/com/google/android/gms/nearby/messages/audio/AudioBytes]
+(don't try this at home)!
+
 
 ## Getting Started
 
-This project is a starting point for a Flutter
-[plug-in package](https://flutter.dev/developing-packages/),
-a specialized package that includes platform-specific implementation code for
-Android and/or iOS.
+```shell
+# Install dependencies.
+flutter pub get
 
-For help getting started with Flutter development, view the
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+# Run tests.
+flutter test
+```
 
 ### File sending log example
 
