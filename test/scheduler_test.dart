@@ -1,49 +1,12 @@
 import 'dart:io';
-import 'dart:math';
 
-import 'package:async/src/cancelable_operation.dart';
-import 'package:channel_multiplexed_scheduler/channels/channel.dart';
-import 'package:channel_multiplexed_scheduler/channels/channel_event.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 import 'package:channel_multiplexed_scheduler/scheduler/scheduler.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-class MockScheduler extends Scheduler {
-  // Stupid dummy implementation using only one channel.
-  @override
-  Future<void> sendChunks(List<FileChunk> chunks, List<Channel> channels, Map<int, CancelableOperation> resubmissionTimers) async {
-    while (chunks.isNotEmpty || resubmissionTimers.isNotEmpty) {
-      if (chunks.isEmpty) {
-        await Future.delayed(const Duration(milliseconds: 200));
-      } else {
-        sendChunk(chunks.removeAt(0), channels[0]);
-      }
-    }
+import 'mock/channel/mock_channel.dart';
+import 'mock/scheduler/mock_scheduler.dart';
 
-    debugPrint('[Scheduler] Finished dispatching all chunks to channels.');
-  }
-}
-
-class MockChannel extends Channel {
-  bool isInit = false;
-  List<int> sentChunksIds = [];
-
-  @override
-  Future<void> init() async {
-    isInit = true;
-  }
-
-  @override
-  Future<void> sendChunk(FileChunk chunk) async {
-    await Future.delayed(Duration(milliseconds: Random().nextInt(2000)), () {
-      if (!sentChunksIds.contains(chunk.identifier)) {
-        sentChunksIds.add(chunk.identifier);
-      }
-      on(ChannelEvent.acknowledgment, chunk.identifier);
-    });
-  }
-}
 
 void main() {
   late File file;
