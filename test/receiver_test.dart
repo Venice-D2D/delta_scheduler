@@ -1,7 +1,6 @@
 import 'dart:io';
 
 import 'package:channel_multiplexed_scheduler/receiver/receiver.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'mock/channel/mock_channel.dart';

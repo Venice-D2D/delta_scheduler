@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:channel_multiplexed_scheduler/channels/channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/channel_event.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
-import 'package:flutter/material.dart';
+
 
 class Receiver {
   late final List<Channel> _channels = [];
