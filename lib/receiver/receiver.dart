@@ -14,5 +14,8 @@ class Receiver {
     if (_channels.isEmpty) {
       throw StateError('Cannot receive file because receiver has no channel.');
     }
+
+    // Open all channels.
+    Future.wait(_channels.map((c) => c.init()));
   }
 }
