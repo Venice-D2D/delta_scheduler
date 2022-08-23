@@ -36,10 +36,10 @@ void main() {
     Channel receiveChannel = FileChannel(directory: chunksFilesDir);
     receiver.useChannel(receiveChannel);
 
-    receiver.receiveFile(Path()).then((value) {
-      debugPrint("Received all file chunks.");
-    });
-
-    await scheduler.sendFile(file, 100000);
+    // Wait for both data sending and reception to end.
+    await Future.wait([
+      receiver.receiveFile(Path()),
+      scheduler.sendFile(file, 100000)
+    ]);
   });
 }
