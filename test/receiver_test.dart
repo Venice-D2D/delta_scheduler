@@ -23,7 +23,9 @@ void main() {
     receiver.useChannel(channel1);
     receiver.useChannel(channel2);
 
-    await receiver.receiveFile(Path());
+    // Don't await the result of this method, because we're not sending anything,
+    // so this would never end...
+    receiver.receiveFile(Path());
 
     expect(channel1.isInitReceiver, true);
     expect(channel2.isInitReceiver, true);
