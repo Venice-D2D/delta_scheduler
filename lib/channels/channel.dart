@@ -9,7 +9,7 @@ abstract class Channel {
   late ChannelCallback on;
 
   /// Initializes current channel, and returns when it is ready to send data.
-  Future<void> init();
+  Future<void> initSender();
 
   /// Sends a file piece through current channel, and returns after successful
   /// sending; this doesn't check if chunk was received.

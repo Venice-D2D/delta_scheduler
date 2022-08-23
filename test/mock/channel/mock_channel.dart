@@ -10,7 +10,7 @@ class MockChannel extends Channel {
   List<int> sentChunksIds = [];
 
   @override
-  Future<void> init() async {
+  Future<void> initSender() async {
     isInit = true;
   }
 
