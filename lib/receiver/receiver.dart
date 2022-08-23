@@ -33,6 +33,9 @@ class Receiver {
 
     // Fill destination file with received chunks.
     File newFile = File(destination);
+    if (newFile.existsSync()) {
+      newFile.deleteSync();
+    }
     newFile.createSync();
     for (var chunk in _chunks.values) {
       debugPrint(chunk.identifier.toString());
