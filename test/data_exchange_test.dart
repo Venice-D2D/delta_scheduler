@@ -42,5 +42,9 @@ void main() {
       receiver.receiveFile(destination),
       scheduler.sendFile(file, 100000)
     ]);
+    
+    File receivedFile = File(destination);
+    expect(receivedFile.existsSync(), true);
+    expect(receivedFile.lengthSync() != 0, true);
   });
 }
