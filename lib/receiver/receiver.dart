@@ -38,7 +38,6 @@ class Receiver {
     }
     newFile.createSync();
     for (var chunk in _chunks.values) {
-      debugPrint(chunk.identifier.toString());
       newFile.writeAsBytesSync(chunk.data, mode: FileMode.append);
     }
   }
