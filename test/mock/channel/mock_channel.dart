@@ -6,12 +6,18 @@ import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 
 
 class MockChannel extends Channel {
-  bool isInit = false;
+  bool isInitSender = false;
+  bool isInitReceiver = false;
   List<int> sentChunksIds = [];
 
   @override
   Future<void> initSender() async {
-    isInit = true;
+    isInitSender = true;
+  }
+
+  @override
+  Future<void> initReceiver() async {
+    isInitReceiver = false;
   }
 
   @override

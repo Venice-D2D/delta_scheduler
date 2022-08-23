@@ -25,7 +25,7 @@ void main() {
 
     await receiver.receiveFile(Path());
 
-    expect(channel1.isInit, true);
-    expect(channel2.isInit, true);
+    expect(channel1.isInitSender, true);
+    expect(channel2.isInitSender, true);
   });
 }

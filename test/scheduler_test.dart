@@ -86,8 +86,8 @@ void main() {
 
       await scheduler.sendFile(file, 100000);
 
-      expect(channel1.isInit, true);
-      expect(channel2.isInit, true);
+      expect(channel1.isInitSender, true);
+      expect(channel2.isInitSender, true);
     });
 
     test('should send all chunks through first channel with test strategy', () async {
