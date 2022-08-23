@@ -8,5 +8,9 @@ class Receiver {
   void useChannel(Channel channel) {}
 
   /// Receives a file through available channels.
-  Future<void> receiveFile(Path destination) async {}
+  Future<void> receiveFile(Path destination) async {
+    if (_channels.isEmpty) {
+      throw StateError('Cannot receive file because receiver has no channel.');
+    }
+  }
 }
