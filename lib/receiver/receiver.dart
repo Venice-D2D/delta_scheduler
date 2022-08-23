@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:channel_multiplexed_scheduler/channels/channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/channel_event.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
@@ -18,7 +20,7 @@ class Receiver {
   }
 
   /// Receives a file through available channels.
-  Future<void> receiveFile(Path destination) async {
+  Future<void> receiveFile(String destination) async {
     if (_channels.isEmpty) {
       throw StateError('Cannot receive file because receiver has no channel.');
     }

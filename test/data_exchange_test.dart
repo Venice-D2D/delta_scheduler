@@ -13,9 +13,11 @@ void main() {
   late Scheduler scheduler;
   late Receiver receiver;
   late File file;
+  late String destination;
 
   setUpAll(() {
     file = File('test/assets/paper.pdf');
+    destination = "${Directory.systemTemp.path}${Platform.pathSeparator}received.pdf";
   });
   setUp(() {
     scheduler = MockScheduler();
@@ -37,7 +39,7 @@ void main() {
 
     // Wait for both data sending and reception to end.
     await Future.wait([
-      receiver.receiveFile(Path()),
+      receiver.receiveFile(destination),
       scheduler.sendFile(file, 100000)
     ]);
   });
