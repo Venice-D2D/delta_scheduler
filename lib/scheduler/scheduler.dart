@@ -28,6 +28,7 @@ abstract class Scheduler {
           }
           break;
         case ChannelEvent.opened:
+        case ChannelEvent.data:
           break;
       }
     };
