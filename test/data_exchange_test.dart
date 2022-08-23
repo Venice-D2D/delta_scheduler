@@ -7,7 +7,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'mock/channel/file_channel.dart';
-import 'mock/channel/mock_channel.dart';
 import 'mock/scheduler/mock_scheduler.dart';
 
 void main() {
