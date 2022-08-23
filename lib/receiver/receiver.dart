@@ -16,6 +16,6 @@ class Receiver {
     }
 
     // Open all channels.
-    Future.wait(_channels.map((c) => c.initSender()));
+    Future.wait(_channels.map((c) => c.initReceiver()));
   }
 }

@@ -17,7 +17,7 @@ class MockChannel extends Channel {
 
   @override
   Future<void> initReceiver() async {
-    isInitReceiver = false;
+    isInitReceiver = true;
   }
 
   @override
