@@ -30,6 +30,14 @@ class Receiver {
 
     // Wait for all chunks to arrive.
     await receiveAllChunks();
+
+    // Fill destination file with received chunks.
+    File newFile = File(destination);
+    newFile.createSync();
+    for (var chunk in _chunks.values) {
+      debugPrint(chunk.identifier.toString());
+      newFile.writeAsBytesSync(chunk.data, mode: FileMode.append);
+    }
   }
 
 
