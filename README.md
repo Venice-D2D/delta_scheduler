@@ -51,7 +51,33 @@ TODO (with code sample)
 
 ### Channel implementation
 
-TODO explain code sample
+```dart
+abstract class Channel {
+  /// Provides information to the scheduler about what's happening in the
+  /// current channel.
+  late ChannelCallback on;
+
+  /// Initializes current channel, and returns when it is ready to send data.
+  Future<void> initSender();
+
+  /// Initializes current channel, and returns when it is ready to receive data.
+  Future<void> initReceiver();
+
+  /// Sends a file piece through current channel, and returns after successful
+  /// sending; this doesn't check if chunk was received.
+  Future<void> sendChunk(FileChunk chunk);
+}
+```
+
+Your custom channel must implement those three methods:
+* `initSender` will be called by the scheduler: you should include in there all code relative to
+socket opening;
+* `initReceiver` will be called by the receiver: it should establish connection with
+connection-opening code contained in `initSender`;
+* `sendChunk` will be called by scheduler sender-side; it should send chunk's data over 
+previously-opened socket.
+
+---
 
 As said previously, the `Channel` interface provided by this package is as abstract as possible to
 let people implement it the way they want.
