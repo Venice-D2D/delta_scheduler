@@ -43,7 +43,15 @@ Receiver is plugged to the same channels as the scheduler, and after collecting 
 rebuilds the file.
 
 
-## Channel implementation
+## Implementation
+
+### Scheduler implementation
+
+TODO (with code sample)
+
+### Channel implementation
+
+TODO explain code sample
 
 As said previously, the `Channel` interface provided by this package is as abstract as possible to
 let people implement it the way they want.
