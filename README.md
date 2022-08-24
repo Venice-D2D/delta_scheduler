@@ -11,7 +11,9 @@ Data exchanges do work as follow:
 
 ## General architecture
 
-![Global data exchange architecture](assets/img/Theory.drawio.png)
+<p align="center">
+  <img src="assets/img/Theory.drawio.png"/>
+</p>
 
 #### Scheduler
 
@@ -56,14 +58,18 @@ There are two ways to implement a channel: you must create either [a package or 
 If you can use Dart or Flutter packages to create your implementation, then *package* is the way to
 go. It only requires you to implement `Channel` interface using third-party packages.
 
-![Package implementation](assets/img/Channel%20implementation%20(package).drawio.png)
+<p align="center">
+  <img src="assets/img/Channel%20implementation%20(package).drawio.png"/>
+</p>
 
 #### Plugin implementation
 
 However, if you need to write channel implementation for each platforms, you'll have to create a 
 *Flutter plugin*, which invokes native code through a [method channel](https://docs.flutter.dev/development/platform-integration/platform-channels).
 
-![Plugin implementation](assets/img/Channel%20implementation%20(plugin).drawio.png)
+<p align="center">
+  <img src="assets/img/Channel%20implementation%20(plugin).drawio.png"/>
+</p>
 
 ## Getting Started
 
