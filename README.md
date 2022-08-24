@@ -9,6 +9,10 @@ Data exchanges do work as follow:
 * Sender-side, a scheduler sends file chunks on channels as it sees fit;
 * Receiver-side, an aggregator reconstructs file from received file chunks.
 
+## General architecture
+
+![Global data exchange architecture](assets/img/Theory.drawio.png)
+
 #### Scheduler
 
 **A scheduler sends a file as chunks going through multiple channels.**
