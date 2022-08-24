@@ -35,6 +35,11 @@ Any wireless technology able to carry data in a wireless fashion can be implemen
 Yeah, [even sound](https://developers.google.com/android/reference/com/google/android/gms/nearby/messages/audio/AudioBytes)!
 (don't try this at home)
 
+#### Receiver
+
+Receiver is plugged to the same channels as the scheduler, and after collecting all file chunks, it 
+rebuilds the file.
+
 
 ## Getting Started
 
