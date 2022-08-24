@@ -5,6 +5,7 @@ import 'package:channel_multiplexed_scheduler/channels/channel_event.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 
 
+/// This is a mock Channel implementation that's used in tests.
 class MockChannel extends Channel {
   bool isInitSender = false;
   bool isInitReceiver = false;
@@ -20,6 +21,8 @@ class MockChannel extends Channel {
     isInitReceiver = true;
   }
 
+  /// Stupid chunk sending emulation, that acknowledges a chunk after a random
+  /// delay to simulate network latency.
   @override
   Future<void> sendChunk(FileChunk chunk) async {
     await Future.delayed(Duration(milliseconds: Random().nextInt(2000)), () {

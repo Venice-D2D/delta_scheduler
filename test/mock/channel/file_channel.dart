@@ -4,10 +4,16 @@ import 'package:channel_multiplexed_scheduler/channels/channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/channel_event.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 
+
+/// This test Channel implementation emulates a network connection by using the
+/// local file system as intermediate between sender and receiver.
 class FileChannel extends Channel {
+  // This directory will store all package exchanged between sender and receiver.
   Directory directory;
   FileChannel({required this.directory});
 
+  /// When a file is created in target directory, this reconstructs file chunk
+  /// from said file and sends it to the receiver.
   @override
   Future<void> initReceiver() async {
     directory.watch(events: FileSystemEvent.create).listen((event) {
@@ -25,6 +31,8 @@ class FileChannel extends Channel {
   @override
   Future<void> initSender() async {}
 
+  /// Simulates sending chunks over network by writing them down in a directory
+  /// as files.
   @override
   Future<void> sendChunk(FileChunk chunk) async {
     File chunkFile = File(directory.path + Platform.pathSeparator + chunk.identifier.toString());
