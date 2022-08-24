@@ -47,7 +47,26 @@ rebuilds the file.
 
 ### Scheduler implementation
 
-TODO (with code sample)
+To implement your scheduler, you must extend the `Scheduler` class, which contains only one method
+for you to implement:
+
+```dart
+/// This lets Scheduler instances implement their own chunks sending policy.
+/// 
+/// The implementation should send all chunks' content, by calling the 
+/// sendChunk method; it can also check for any resubmission timer presence, 
+/// to avoid finishing execution while some chunks have not been acknowledged.
+Future<void> sendChunks(
+  List<FileChunk> chunks,
+  List<Channel> channels,
+  Map<int, CancelableOperation> resubmissionTimers);
+```
+
+Your `sendChunks` implementation must send all `chunks` through available `channels`; the 
+`resubmissionTimers` variable holds delays until a chunk is considered as not-transmitted, and must
+be sent again; timers handling is done by the `Scheduler` class itself (*i.e. don't touch it*), but 
+you can still check its content (like `tests/mock/scheduler/MockScheduler` does) to ensure all
+chunks have been transmitted successfully.
 
 ### Channel implementation
 
