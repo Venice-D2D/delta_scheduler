@@ -1,7 +1,7 @@
 # channel_multiplexed_scheduler
 
 This project aims at providing a unified abstract interface to exchange data between devices using
-different wireless technologies.
+different technologies.
 
 Data exchanges do work as follow:
 * File exchange is done between a sender and a receiver;
@@ -31,7 +31,7 @@ channel-selection policy of your choice.
 This package provides a arbitrary-abstract `Channel` interface for other packages to implement, the 
 idea being that you can implement a channel with whatever you want: Wi-Fi, Bluetooth... 
 
-Any wireless technology able to carry data in a wireless fashion can be implemented into a channel!
+Any technology able to carry data can be implemented into a channel!
 Yeah, [even sound](https://developers.google.com/android/reference/com/google/android/gms/nearby/messages/audio/AudioBytes)!
 (don't try this at home)
 
@@ -40,6 +40,30 @@ Yeah, [even sound](https://developers.google.com/android/reference/com/google/an
 Receiver is plugged to the same channels as the scheduler, and after collecting all file chunks, it 
 rebuilds the file.
 
+
+## Channel implementation
+
+As said previously, the `Channel` interface provided by this package is as abstract as possible to
+let people implement it the way they want.
+
+It is written in Dart, and thus can be used on a variety of platforms: Android, iOS, Linux, Windows
+and macOS.
+
+There are two ways to implement a channel: you must create either [a package or a plugin](https://docs.flutter.dev/development/packages-and-plugins/developing-packages).
+
+#### Package implementation
+
+If you can use Dart or Flutter packages to create your implementation, then *package* is the way to
+go. It only requires you to implement `Channel` interface using third-party packages.
+
+![Package implementation](assets/img/Channel%20implementation%20(package).drawio.png)
+
+#### Plugin implementation
+
+However, if you need to write channel implementation for each platforms, you'll have to create a 
+*Flutter plugin*, which invokes native code through a [method channel](https://docs.flutter.dev/development/platform-integration/platform-channels).
+
+![Plugin implementation](assets/img/Channel%20implementation%20(plugin).drawio.png)
 
 ## Getting Started
 
