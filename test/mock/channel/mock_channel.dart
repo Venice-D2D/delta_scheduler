@@ -33,7 +33,7 @@ class MockChannel extends Channel {
   @override
   Future<void> sendChunk(FileChunk chunk) async {
     Random r = Random();
-    if (shouldDropChunks && r.nextBool()) {
+    if (shouldDropChunks && r.nextDouble() < 0.3) {
       debugPrint('==> [MockChannel] Dropped chunk n°${chunk.identifier}.');
       return;
     }
