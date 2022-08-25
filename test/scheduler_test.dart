@@ -104,5 +104,17 @@ void main() {
       expect(channel1.sentChunksIds, [0, 1, 2, 3, 4, 5, 6, 7, 8]);
       expect(channel2.sentChunksIds.isEmpty, true);
     });
+
+    test('should send all chunks even if some are dropped', () async {
+      MockChannel channel = MockChannel(shouldDropChunks: true);
+
+      scheduler.useChannel(channel);
+      await scheduler.sendFile(file, 100000);
+
+      // chunks are not sent in order, so we need to sort their ids
+      channel.sentChunksIds.sort((int a, int b) => a - b);
+
+      expect(channel.sentChunksIds, [0, 1, 2, 3, 4, 5, 6, 7, 8]);
+    });
   });
 }
