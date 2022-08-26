@@ -28,6 +28,7 @@ abstract class Scheduler {
           }
           break;
         case ChannelEvent.opened:
+        case ChannelEvent.data:
           break;
       }
     };
@@ -48,7 +49,7 @@ abstract class Scheduler {
     _chunksQueue = splitFile(file, chunksize);
     
     // Open all channels.
-    Future.wait(_channels.map((c) => c.init()));
+    Future.wait(_channels.map((c) => c.initSender()));
 
     // Begin sending chunks.
     await sendChunks(_chunksQueue, _channels, _resubmissionTimers);

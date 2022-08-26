@@ -47,11 +47,56 @@ rebuilds the file.
 
 ### Scheduler implementation
 
-TODO (with code sample)
+To implement your scheduler, you must extend the `Scheduler` class, which contains only one method
+for you to implement:
+
+```dart
+/// This lets Scheduler instances implement their own chunks sending policy.
+/// 
+/// The implementation should send all chunks' content, by calling the 
+/// sendChunk method; it can also check for any resubmission timer presence, 
+/// to avoid finishing execution while some chunks have not been acknowledged.
+Future<void> sendChunks(
+  List<FileChunk> chunks,
+  List<Channel> channels,
+  Map<int, CancelableOperation> resubmissionTimers);
+```
+
+Your `sendChunks` implementation must send all `chunks` through available `channels`; the 
+`resubmissionTimers` variable holds delays until a chunk is considered as not-transmitted, and must
+be sent again; timers handling is done by the `Scheduler` class itself (*i.e. don't touch it*), but 
+you can still check its content (like `tests/mock/scheduler/MockScheduler` does) to ensure all
+chunks have been transmitted successfully.
 
 ### Channel implementation
 
-TODO explain code sample
+```dart
+abstract class Channel {
+  /// Provides information to the scheduler about what's happening in the
+  /// current channel.
+  late ChannelCallback on;
+
+  /// Initializes current channel, and returns when it is ready to send data.
+  Future<void> initSender();
+
+  /// Initializes current channel, and returns when it is ready to receive data.
+  Future<void> initReceiver();
+
+  /// Sends a file piece through current channel, and returns after successful
+  /// sending; this doesn't check if chunk was received.
+  Future<void> sendChunk(FileChunk chunk);
+}
+```
+
+Your custom channel must implement those three methods:
+* `initSender` will be called by the scheduler: you should include in there all code relative to
+socket opening;
+* `initReceiver` will be called by the receiver: it should establish connection with
+connection-opening code contained in `initSender`;
+* `sendChunk` will be called by scheduler sender-side; it should send chunk's data over 
+previously-opened socket.
+
+---
 
 As said previously, the `Channel` interface provided by this package is as abstract as possible to
 let people implement it the way they want.
