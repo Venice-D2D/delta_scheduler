@@ -22,7 +22,7 @@ class MockChannel extends Channel {
   }
 
   @override
-  Future<void> initReceiver() async {
+  Future<void> initReceiver({Map<String, dynamic> parameters = map}) async {
     isInitReceiver = true;
   }
 

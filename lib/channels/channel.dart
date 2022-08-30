@@ -2,6 +2,7 @@ import 'package:channel_multiplexed_scheduler/channels/channel_event.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 
 typedef ChannelCallback = Function(ChannelEvent even, dynamic data);
+const map = <String, dynamic>{};
 
 abstract class Channel {
   /// Provides information to the scheduler about what's happening in the
@@ -12,7 +13,7 @@ abstract class Channel {
   Future<void> initSender();
 
   /// Initializes current channel, and returns when it is ready to receive data.
-  Future<void> initReceiver();
+  Future<void> initReceiver({Map<String, dynamic> parameters = map});
 
   /// Sends a file piece through current channel, and returns after successful
   /// sending; this doesn't check if chunk was received.
