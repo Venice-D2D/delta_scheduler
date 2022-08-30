@@ -15,7 +15,7 @@ class FileChannel extends Channel {
   /// When a file is created in target directory, this reconstructs file chunk
   /// from said file and sends it to the receiver.
   @override
-  Future<void> initReceiver({Map<String, dynamic> parameters = map}) async {
+  Future<void> initReceiver({Map<String, dynamic> parameters = const {}}) async {
     directory.watch(events: FileSystemEvent.create).listen((event) {
       // Rebuild FileChunk instance.
       File receivedChunk = File(event.path);
