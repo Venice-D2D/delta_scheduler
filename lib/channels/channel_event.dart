@@ -4,5 +4,9 @@ enum ChannelEvent {
   data,
 
   // channel events
-  opened
+  opened,
+
+  // bootstrap events
+  channelMetadata,
+  fileMetadata
 }
