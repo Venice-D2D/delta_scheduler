@@ -7,10 +7,10 @@ import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 
 /// This test Channel implementation emulates a network connection by using the
 /// local file system as intermediate between sender and receiver.
-class FileChannel extends DataChannel {
+class FileDataChannel extends DataChannel {
   // This directory will store all package exchanged between sender and receiver.
   Directory directory;
-  FileChannel({required this.directory});
+  FileDataChannel({required this.directory});
 
   /// When a file is created in target directory, this reconstructs file chunk
   /// from said file and sends it to the receiver.

@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:channel_multiplexed_scheduler/receiver/receiver.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'mock/channel/mock_channel.dart';
+import 'mock/channel/mock_data_channel.dart';
 
 void main() {
   late Receiver receiver;
@@ -23,8 +23,8 @@ void main() {
   });
 
   test('should init channels', () async {
-    MockChannel channel1 = MockChannel();
-    MockChannel channel2 = MockChannel();
+    MockDataChannel channel1 = MockDataChannel();
+    MockDataChannel channel2 = MockDataChannel();
     receiver.useChannel(channel1);
     receiver.useChannel(channel2);
 

@@ -7,13 +7,13 @@ import 'package:flutter/material.dart';
 
 
 /// This is a mock Channel implementation that's used in tests.
-class MockChannel extends DataChannel {
+class MockDataChannel extends DataChannel {
   bool shouldDropChunks;
   bool isInitSender = false;
   bool isInitReceiver = false;
   List<int> sentChunksIds = [];
 
-  MockChannel({this.shouldDropChunks = false});
+  MockDataChannel({this.shouldDropChunks = false});
 
 
   @override

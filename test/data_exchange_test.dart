@@ -5,7 +5,7 @@ import 'package:channel_multiplexed_scheduler/receiver/receiver.dart';
 import 'package:channel_multiplexed_scheduler/scheduler/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'mock/channel/file_channel.dart';
+import 'mock/channel/file_data_channel.dart';
 import 'mock/scheduler/mock_scheduler.dart';
 
 void main() {
@@ -29,11 +29,11 @@ void main() {
     chunksFilesDir.createSync();
 
     // sending part
-    DataChannel sendChannel = FileChannel(directory: chunksFilesDir);
+    DataChannel sendChannel = FileDataChannel(directory: chunksFilesDir);
     scheduler.useChannel(sendChannel);
 
     // receiving end
-    DataChannel receiveChannel = FileChannel(directory: chunksFilesDir);
+    DataChannel receiveChannel = FileDataChannel(directory: chunksFilesDir);
     receiver.useChannel(receiveChannel);
 
     // Wait for both data sending and reception to end.

@@ -4,7 +4,7 @@ import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 import 'package:channel_multiplexed_scheduler/scheduler/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'mock/channel/mock_channel.dart';
+import 'mock/channel/mock_data_channel.dart';
 import 'mock/scheduler/mock_scheduler.dart';
 
 
@@ -79,8 +79,8 @@ void main() {
     });
 
     test('should init channels', () async {
-      MockChannel channel1 = MockChannel();
-      MockChannel channel2 = MockChannel();
+      MockDataChannel channel1 = MockDataChannel();
+      MockDataChannel channel2 = MockDataChannel();
       scheduler.useChannel(channel1);
       scheduler.useChannel(channel2);
 
@@ -91,8 +91,8 @@ void main() {
     });
 
     test('should send all chunks through first channel with test strategy', () async {
-      MockChannel channel1 = MockChannel();
-      MockChannel channel2 = MockChannel();
+      MockDataChannel channel1 = MockDataChannel();
+      MockDataChannel channel2 = MockDataChannel();
       scheduler.useChannel(channel1);
       scheduler.useChannel(channel2);
 
@@ -106,7 +106,7 @@ void main() {
     });
 
     test('should send all chunks even if some are dropped', () async {
-      MockChannel channel = MockChannel(shouldDropChunks: true);
+      MockDataChannel channel = MockDataChannel(shouldDropChunks: true);
 
       scheduler.useChannel(channel);
       await scheduler.sendFile(file, 100000);
