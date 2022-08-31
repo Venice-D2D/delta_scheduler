@@ -1,0 +1,4 @@
+enum BootstrapChannelEvent {
+  channelMetadata,
+  fileMetadata
+}
