@@ -1,5 +1,5 @@
 import 'package:async/async.dart';
-import 'package:channel_multiplexed_scheduler/channels/channel.dart';
+import 'package:channel_multiplexed_scheduler/channels/data_channel.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 import 'package:channel_multiplexed_scheduler/scheduler/scheduler.dart';
 import 'package:flutter/material.dart';
@@ -11,7 +11,7 @@ class MockScheduler extends Scheduler {
   /// Note the while loop that won't quit once all chunks have been sent, but
   /// once all chunks have been acknowledged.
   @override
-  Future<void> sendChunks(List<FileChunk> chunks, List<Channel> channels, Map<int, CancelableOperation> resubmissionTimers) async {
+  Future<void> sendChunks(List<FileChunk> chunks, List<DataChannel> channels, Map<int, CancelableOperation> resubmissionTimers) async {
     while (chunks.isNotEmpty || resubmissionTimers.isNotEmpty) {
       if (chunks.isEmpty) {
         await Future.delayed(const Duration(milliseconds: 200));

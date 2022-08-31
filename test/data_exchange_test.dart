@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:channel_multiplexed_scheduler/channels/channel.dart';
+import 'package:channel_multiplexed_scheduler/channels/data_channel.dart';
 import 'package:channel_multiplexed_scheduler/receiver/receiver.dart';
 import 'package:channel_multiplexed_scheduler/scheduler/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -29,7 +30,7 @@ void main() {
     chunksFilesDir.createSync();
 
     // sending part
-    Channel sendChannel = FileChannel(directory: chunksFilesDir);
+    DataChannel sendChannel = FileChannel(directory: chunksFilesDir);
     scheduler.useChannel(sendChannel);
 
     // receiving end

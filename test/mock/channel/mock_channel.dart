@@ -1,13 +1,13 @@
 import 'dart:math';
 
-import 'package:channel_multiplexed_scheduler/channels/channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/channel_event.dart';
+import 'package:channel_multiplexed_scheduler/channels/data_channel.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 import 'package:flutter/material.dart';
 
 
 /// This is a mock Channel implementation that's used in tests.
-class MockChannel extends Channel {
+class MockChannel extends DataChannel {
   bool shouldDropChunks;
   bool isInitSender = false;
   bool isInitReceiver = false;

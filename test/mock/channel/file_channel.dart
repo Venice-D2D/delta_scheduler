@@ -1,13 +1,13 @@
 import 'dart:io';
 
-import 'package:channel_multiplexed_scheduler/channels/channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/channel_event.dart';
+import 'package:channel_multiplexed_scheduler/channels/data_channel.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 
 
 /// This test Channel implementation emulates a network connection by using the
 /// local file system as intermediate between sender and receiver.
-class FileChannel extends Channel {
+class FileChannel extends DataChannel {
   // This directory will store all package exchanged between sender and receiver.
   Directory directory;
   FileChannel({required this.directory});

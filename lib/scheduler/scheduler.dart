@@ -4,19 +4,18 @@ import 'dart:typed_data';
 
 import 'package:async/async.dart';
 import 'package:channel_multiplexed_scheduler/channels/channel_event.dart';
+import 'package:channel_multiplexed_scheduler/channels/data_channel.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 import 'package:flutter/material.dart';
 
-import '../channels/channel.dart';
-
 
 abstract class Scheduler {
-  late final List<Channel> _channels = [];
+  late final List<DataChannel> _channels = [];
   late List<FileChunk> _chunksQueue = [];
   final Map<int, CancelableOperation> _resubmissionTimers = {};
 
   /// Adds a channel to be used to send file chunks.
-  void useChannel(Channel channel) {
+  void useChannel(DataChannel channel) {
     _channels.add(channel);
     channel.on = (ChannelEvent event, dynamic data) {
       switch (event) {
@@ -62,7 +61,7 @@ abstract class Scheduler {
   /// to avoid finishing execution while some chunks have not been acknowledged.
   Future<void> sendChunks(
       List<FileChunk> chunks,
-      List<Channel> channels,
+      List<DataChannel> channels,
       Map<int, CancelableOperation> resubmissionTimers);
 
   /// Sends a data chunk through a specified channel.
@@ -70,7 +69,7 @@ abstract class Scheduler {
   /// If such chunk is not acknowledged within a given duration, this will put
   /// the chunk at the head of the sending queue, for it to be resent as soon
   /// as possible.
-  Future<void> sendChunk(FileChunk chunk, Channel channel) async {
+  Future<void> sendChunk(FileChunk chunk, DataChannel channel) async {
     bool acknowledged = false;
     bool timedOut = false;
 
