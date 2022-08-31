@@ -1,0 +1,4 @@
+enum DataChannelEvent {
+  acknowledgment,
+  data
+}

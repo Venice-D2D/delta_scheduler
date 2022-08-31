@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:channel_multiplexed_scheduler/channels/channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/data_channel.dart';
 import 'package:channel_multiplexed_scheduler/receiver/receiver.dart';
 import 'package:channel_multiplexed_scheduler/scheduler/scheduler.dart';
@@ -34,7 +33,7 @@ void main() {
     scheduler.useChannel(sendChannel);
 
     // receiving end
-    Channel receiveChannel = FileChannel(directory: chunksFilesDir);
+    DataChannel receiveChannel = FileChannel(directory: chunksFilesDir);
     receiver.useChannel(receiveChannel);
 
     // Wait for both data sending and reception to end.

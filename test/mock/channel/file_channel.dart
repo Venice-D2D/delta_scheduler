@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:channel_multiplexed_scheduler/channels/events/channel_event.dart';
 import 'package:channel_multiplexed_scheduler/channels/data_channel.dart';
+import 'package:channel_multiplexed_scheduler/channels/events/data_channel_event.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 
 
@@ -24,7 +24,7 @@ class FileChannel extends DataChannel {
           data: receivedChunk.readAsBytesSync());
 
       // Send an event with received chunk as parameter.
-      on(ChannelEvent.data, chunk);
+      on(DataChannelEvent.data, chunk);
     });
   }
 
@@ -38,6 +38,6 @@ class FileChannel extends DataChannel {
     File chunkFile = File(directory.path + Platform.pathSeparator + chunk.identifier.toString());
     chunkFile.createSync();
     chunkFile.writeAsBytesSync(chunk.data);
-    on(ChannelEvent.acknowledgment, chunk.identifier);
+    on(DataChannelEvent.acknowledgment, chunk.identifier);
   }
 }
