@@ -27,7 +27,7 @@ class Receiver {
     }
 
     // Open all channels.
-    Future.wait(_channels.map((c) => c.initReceiver()));
+    await Future.wait(_channels.map((c) => c.initReceiver()));
 
     // Wait for all chunks to arrive.
     await receiveAllChunks();
