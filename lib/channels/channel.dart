@@ -1,4 +1,4 @@
-import 'package:channel_multiplexed_scheduler/channels/channel_event.dart';
+import 'package:channel_multiplexed_scheduler/channels/events/channel_event.dart';
 
 typedef ChannelCallback = Function(ChannelEvent even, dynamic data);
 
