@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:channel_multiplexed_scheduler/channels/data_channel.dart';
+import 'package:channel_multiplexed_scheduler/channels/implementation/data_channel.dart';
 import 'package:channel_multiplexed_scheduler/receiver/receiver.dart';
 import 'package:channel_multiplexed_scheduler/scheduler/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';

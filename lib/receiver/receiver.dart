@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:channel_multiplexed_scheduler/channels/channel.dart';
-import 'package:channel_multiplexed_scheduler/channels/data_channel.dart';
+import 'package:channel_multiplexed_scheduler/channels/implementation/data_channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/events/data_channel_event.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 
