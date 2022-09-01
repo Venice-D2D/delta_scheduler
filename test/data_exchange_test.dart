@@ -1,16 +1,19 @@
 import 'dart:io';
 
+import 'package:channel_multiplexed_scheduler/channels/implementation/bootstrap_channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/implementation/data_channel.dart';
 import 'package:channel_multiplexed_scheduler/receiver/receiver.dart';
 import 'package:channel_multiplexed_scheduler/scheduler/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'mock/channel/file_data_channel.dart';
+import 'mock/channel/mock_bootstrap_channel.dart';
 import 'mock/scheduler/mock_scheduler.dart';
 
 void main() {
   late Scheduler scheduler;
   late Receiver receiver;
+  late BootstrapChannel bootstrapChannel;
   late File file;
   late String destination;
 
@@ -19,7 +22,8 @@ void main() {
     destination = "${Directory.systemTemp.path}${Platform.pathSeparator}received.pdf";
   });
   setUp(() {
-    scheduler = MockScheduler();
+    bootstrapChannel = MockBootstrapChannel();
+    scheduler = MockScheduler( bootstrapChannel );
     receiver = Receiver();
   });
 

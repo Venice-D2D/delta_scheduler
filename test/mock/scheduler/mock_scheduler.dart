@@ -7,6 +7,8 @@ import 'package:flutter/material.dart';
 
 /// This is a mock Scheduler implementation, used in tests.
 class MockScheduler extends Scheduler {
+  MockScheduler(super.bootstrapChannel);
+
   /// Stupid dummy implementation using only one channel.
   /// Note the while loop that won't quit once all chunks have been sent, but
   /// once all chunks have been acknowledged.

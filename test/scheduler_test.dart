@@ -1,9 +1,11 @@
 import 'dart:io';
 
+import 'package:channel_multiplexed_scheduler/channels/implementation/bootstrap_channel.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 import 'package:channel_multiplexed_scheduler/scheduler/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'mock/channel/mock_bootstrap_channel.dart';
 import 'mock/channel/mock_data_channel.dart';
 import 'mock/scheduler/mock_scheduler.dart';
 
@@ -11,6 +13,7 @@ import 'mock/scheduler/mock_scheduler.dart';
 void main() {
   late File file;
   late int fileLength;
+  late BootstrapChannel bootstrapChannel;
   late Scheduler scheduler;
 
   setUpAll(() {
@@ -18,7 +21,8 @@ void main() {
     fileLength = file.lengthSync();
   });
   setUp(() {
-    scheduler = MockScheduler();
+    bootstrapChannel = MockBootstrapChannel();
+    scheduler = MockScheduler( bootstrapChannel );
   });
 
 

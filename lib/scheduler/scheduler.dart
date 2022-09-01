@@ -3,16 +3,23 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:async/async.dart';
+import 'package:channel_multiplexed_scheduler/channels/events/bootstrap_channel_event.dart';
+import 'package:channel_multiplexed_scheduler/channels/implementation/bootstrap_channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/implementation/data_channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/events/data_channel_event.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
+import 'package:channel_multiplexed_scheduler/file/file_metadata.dart';
 import 'package:flutter/material.dart';
 
 
 abstract class Scheduler {
+  final BootstrapChannel bootstrapChannel;
   late final List<DataChannel> _channels = [];
   late List<FileChunk> _chunksQueue = [];
   final Map<int, CancelableOperation> _resubmissionTimers = {};
+
+  Scheduler(this.bootstrapChannel);
+
 
   /// Adds a channel to be used to send file chunks.
   void useChannel(DataChannel channel) {
@@ -45,9 +52,16 @@ abstract class Scheduler {
     }
 
     _chunksQueue = splitFile(file, chunksize);
+
+    // Open bootstrap channel and send file metadata.
+    await bootstrapChannel.initSender();
+    await bootstrapChannel.sendFileMetadata(
+        FileMetadata(file.uri.pathSegments.last, chunksize, _chunksQueue.length)
+    );
     
     // Open all channels.
-    await Future.wait(_channels.map((c) => c.initSender()));
+    // TODO force data channels to take a bootstrap channel as parameter
+    await Future.wait(_channels.map((c) => c.initSender(data: bootstrapChannel)));
 
     // Begin sending chunks.
     await sendChunks(_chunksQueue, _channels, _resubmissionTimers);
