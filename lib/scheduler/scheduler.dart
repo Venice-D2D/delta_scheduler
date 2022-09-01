@@ -3,7 +3,6 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:async/async.dart';
-import 'package:channel_multiplexed_scheduler/channels/events/bootstrap_channel_event.dart';
 import 'package:channel_multiplexed_scheduler/channels/implementation/bootstrap_channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/implementation/data_channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/events/data_channel_event.dart';
