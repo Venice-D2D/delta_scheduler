@@ -54,7 +54,7 @@ class FileDataChannel extends DataChannel {
   /// Reception end will tell it's ready by creating a file in the watched
   /// directory.
   @override
-  Future<void> initSender() async {
+  Future<void> initSender({data = const {}}) async {
     bool isReceiverReady = false;
 
     StreamSubscription stream = directory.watch(events: FileSystemEvent.create).listen((event) {

@@ -17,7 +17,7 @@ class MockDataChannel extends DataChannel {
 
 
   @override
-  Future<void> initSender() async {
+  Future<void> initSender({data = const {}}) async {
     isInitSender = true;
   }
 
