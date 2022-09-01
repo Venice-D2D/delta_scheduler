@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:channel_multiplexed_scheduler/receiver/receiver.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'mock/channel/mock_bootstrap_channel.dart';
 import 'mock/channel/mock_data_channel.dart';
 
 void main() {
@@ -13,7 +14,7 @@ void main() {
     destination = "${Directory.systemTemp.path}${Platform.pathSeparator}received.pdf";
   });
   setUp(() {
-    receiver = Receiver();
+    receiver = Receiver( MockBootstrapChannel() );
   });
 
   test('should throw when receiving file with no channel', () {

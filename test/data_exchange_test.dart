@@ -6,30 +6,37 @@ import 'package:channel_multiplexed_scheduler/receiver/receiver.dart';
 import 'package:channel_multiplexed_scheduler/scheduler/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'mock/channel/file_bootstrap_channel.dart';
 import 'mock/channel/file_data_channel.dart';
-import 'mock/channel/mock_bootstrap_channel.dart';
 import 'mock/scheduler/mock_scheduler.dart';
 
 void main() {
   late Scheduler scheduler;
   late Receiver receiver;
-  late BootstrapChannel bootstrapChannel;
+  late BootstrapChannel bootstrapSendingChannel;
+  late BootstrapChannel bootstrapReceivingChannel;
   late File file;
   late String destination;
+  final int currentTime = DateTime.now().millisecondsSinceEpoch;
 
   setUpAll(() {
     file = File('test/assets/paper.pdf');
     destination = "${Directory.systemTemp.path}${Platform.pathSeparator}received.pdf";
   });
   setUp(() {
-    bootstrapChannel = MockBootstrapChannel();
-    scheduler = MockScheduler( bootstrapChannel );
-    receiver = Receiver();
+    // we use temporary storage to act as network for bootstrap channel
+    Directory chunksFilesDir = Directory("${Directory.systemTemp.path}${Platform.pathSeparator}$currentTime${Platform.pathSeparator}bootstrap");
+    chunksFilesDir.createSync();
+
+    bootstrapSendingChannel = FileBootstrapChannel( directory: chunksFilesDir );
+    bootstrapReceivingChannel = FileBootstrapChannel( directory: chunksFilesDir );
+    scheduler = MockScheduler( bootstrapSendingChannel );
+    receiver = Receiver( bootstrapReceivingChannel );
   });
 
   test('scheduler should exchange file with receiver', () async {
     // we use temporary storage to act as network
-    Directory chunksFilesDir = Directory(Directory.systemTemp.path + Platform.pathSeparator + DateTime.now().millisecondsSinceEpoch.toString());
+    Directory chunksFilesDir = Directory(Directory.systemTemp.path + Platform.pathSeparator + (currentTime+1).toString());
     chunksFilesDir.createSync();
 
     // sending part

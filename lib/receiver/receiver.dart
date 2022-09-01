@@ -1,15 +1,23 @@
 import 'dart:io';
 
 import 'package:channel_multiplexed_scheduler/channels/channel.dart';
+import 'package:channel_multiplexed_scheduler/channels/channel_metadata.dart';
+import 'package:channel_multiplexed_scheduler/channels/events/bootstrap_channel_event.dart';
+import 'package:channel_multiplexed_scheduler/channels/implementation/bootstrap_channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/implementation/data_channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/events/data_channel_event.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
+import 'package:channel_multiplexed_scheduler/file/file_metadata.dart';
 
 
 class Receiver {
+  final BootstrapChannel bootstrapChannel;
   late final List<Channel> _channels = [];
   final Map<int, FileChunk> _chunks = {};
-  final int _chunksCount = 9; // TODO handle this from scheduler through a channel
+  int _chunksCount = 9; // TODO handle this from scheduler through a channel
+
+  Receiver(this.bootstrapChannel);
+
 
   /// Adds a channel to use to receive data.
   void useChannel(DataChannel channel) {
@@ -22,12 +30,38 @@ class Receiver {
 
   /// Receives a file through available channels.
   Future<void> receiveFile(String destination) async {
+    bool allChannelsInitialized = false;
+
     if (_channels.isEmpty) {
       throw StateError('Cannot receive file because receiver has no channel.');
     }
 
-    // Open all channels.
-    await Future.wait(_channels.map((c) => c.initReceiver()));
+    // Open bootstrap channel.
+    bootstrapChannel.on = (BootstrapChannelEvent event, dynamic data) async {
+      switch(event) {
+        case BootstrapChannelEvent.fileMetadata:
+          // TODO use file name
+          // TODO use chunk size
+          FileMetadata fileMetadata = data;
+          _chunksCount = fileMetadata.chunkCount;
+          break;
+        case BootstrapChannelEvent.channelMetadata:
+          // Open all channels.
+          ChannelMetadata channelMetadata = data;
+          await Future.wait(_channels.map((c) => c.initReceiver(
+            parameters: {data: channelMetadata}
+          )));
+          allChannelsInitialized = true;
+          break;
+      }
+    };
+    await bootstrapChannel.initReceiver();
+
+    // Wait for bootstrap channel to receive channel information and initialize
+    // them.
+    while (!allChannelsInitialized) {
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
 
     // Wait for all chunks to arrive.
     await receiveAllChunks();
