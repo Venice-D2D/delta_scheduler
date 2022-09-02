@@ -49,7 +49,7 @@ class Receiver {
           // Open all channels.
           ChannelMetadata channelMetadata = data;
           await Future.wait(_channels.map((c) => c.initReceiver(
-            parameters: {data: channelMetadata}
+            parameters: {"data": channelMetadata}
           )));
           allChannelsInitialized = true;
           break;
