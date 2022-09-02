@@ -48,6 +48,7 @@ class Receiver {
         case BootstrapChannelEvent.channelMetadata:
           // Open all channels.
           ChannelMetadata channelMetadata = data;
+          // TODO add a channel identifier, not to send all metadata to all channels
           await Future.wait(_channels.map((c) => c.initReceiver(
             parameters: {"data": channelMetadata}
           )));
