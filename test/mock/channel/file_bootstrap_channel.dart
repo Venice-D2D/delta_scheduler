@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:channel_multiplexed_scheduler/channels/channel_metadata.dart';
+import 'package:channel_multiplexed_scheduler/channels/events/bootstrap_channel_event.dart';
 import 'package:channel_multiplexed_scheduler/channels/implementation/bootstrap_channel.dart';
 import 'package:channel_multiplexed_scheduler/file/file_metadata.dart';
 import 'package:flutter/material.dart';
@@ -15,7 +16,25 @@ class FileBootstrapChannel extends BootstrapChannel {
 
   @override
   Future<void> initReceiver({Map<String, dynamic> parameters = const {}}) async {
-    // TODO listen created files and dispatch according events
+    directory.watch(events: FileSystemEvent.create).listen((event) async {
+      File receivedPacket = File(event.path);
+      String content = await receivedPacket.readAsString();
+      List<String> words = content.split(";");
+
+      final String indicator = words[0];
+      if (words.length != 4) {
+        throw StateError("Received mock packet with incorrect format.");
+      }
+      if (!["c", "f"].contains(indicator)) {
+        throw StateError("Received mock packet with incorrect data type.");
+      }
+
+      if (indicator == "c") {
+        on(BootstrapChannelEvent.channelMetadata, ChannelMetadata(words[1], words[2], words[3]));
+      } else {
+        on(BootstrapChannelEvent.fileMetadata, FileMetadata(words[1], int.parse(words[2]), int.parse(words[3])));
+      }
+    });
     // TODO distinguish channel and file metadata
   }
 
