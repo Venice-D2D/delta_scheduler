@@ -26,7 +26,7 @@ void main() {
   setUp(() {
     // we use temporary storage to act as network for bootstrap channel
     Directory chunksFilesDir = Directory("${Directory.systemTemp.path}${Platform.pathSeparator}$currentTime${Platform.pathSeparator}bootstrap");
-    chunksFilesDir.createSync();
+    chunksFilesDir.createSync(recursive: true);
 
     bootstrapSendingChannel = FileBootstrapChannel( directory: chunksFilesDir );
     bootstrapReceivingChannel = FileBootstrapChannel( directory: chunksFilesDir );
