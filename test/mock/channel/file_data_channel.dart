@@ -2,6 +2,8 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
+import 'package:channel_multiplexed_scheduler/channels/channel_metadata.dart';
+import 'package:channel_multiplexed_scheduler/channels/implementation/bootstrap_channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/implementation/data_channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/events/data_channel_event.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
@@ -64,6 +66,12 @@ class FileDataChannel extends DataChannel {
         isReceiverReady = true;
       }
     });
+
+    // Simulate sending channel information to receiving end.
+    BootstrapChannel channel = data;
+    await channel.sendChannelMetadata(
+        ChannelMetadata("176.122.202.107", "fileDataChannel", "3d91a583")
+    );
 
     // If receiver end is not ready, we wait a bit.
     await Future.doWhile(() async {
