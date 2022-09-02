@@ -9,4 +9,13 @@ class FileMetadata {
   String toString() {
     return "$name;$chunkSize;$chunkCount";
   }
+
+  @override
+  bool operator ==(Object other) {
+    return other is FileMetadata && name == other.name && chunkSize == other.chunkSize && chunkCount == other.chunkCount;
+  }
+
+  @override
+  int get hashCode => int.parse("${name.hashCode}${chunkSize.hashCode}${chunkCount.hashCode}");
+
 }
