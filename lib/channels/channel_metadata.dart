@@ -16,5 +16,5 @@ class ChannelMetadata {
   }
 
   @override
-  int get hashCode => int.parse("${address.hashCode}${identifier.hashCode}${password.hashCode}");
+  int get hashCode => Object.hash(address, identifier, password);
 }

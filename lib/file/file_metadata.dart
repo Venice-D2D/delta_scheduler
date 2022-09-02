@@ -16,6 +16,5 @@ class FileMetadata {
   }
 
   @override
-  int get hashCode => int.parse("${name.hashCode}${chunkSize.hashCode}${chunkCount.hashCode}");
-
+  int get hashCode => Object.hash(name, chunkSize, chunkCount);
 }
