@@ -31,6 +31,7 @@ class Receiver {
   /// Receives a file through available channels.
   Future<void> receiveFile(String destination) async {
     bool allChannelsInitialized = false;
+    bool fileMetadataReceived = false;
 
     if (_channels.isEmpty) {
       throw StateError('Cannot receive file because receiver has no channel.');
@@ -44,6 +45,7 @@ class Receiver {
           // TODO use chunk size
           FileMetadata fileMetadata = data;
           _chunksCount = fileMetadata.chunkCount;
+          fileMetadataReceived = true;
           break;
         case BootstrapChannelEvent.channelMetadata:
           // Open all channels.
@@ -60,7 +62,7 @@ class Receiver {
 
     // Wait for bootstrap channel to receive channel information and initialize
     // them.
-    while (!allChannelsInitialized) {
+    while (!allChannelsInitialized || !fileMetadataReceived) {
       await Future.delayed(const Duration(milliseconds: 100));
     }
 
