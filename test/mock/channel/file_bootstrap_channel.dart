@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:channel_multiplexed_scheduler/channels/channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/channel_metadata.dart';
 import 'package:channel_multiplexed_scheduler/channels/events/bootstrap_channel_event.dart';
 import 'package:channel_multiplexed_scheduler/channels/implementation/bootstrap_channel.dart';
@@ -16,6 +17,7 @@ class FileBootstrapChannel extends BootstrapChannel {
 
   @override
   Future<void> initReceiver({Map<String, dynamic> parameters = const {}}) async {
+    debugPrint("[FileBootstrapChannel][initReceiver] Start receiving end initialization.");
     directory.watch(events: FileSystemEvent.create).listen((event) async {
       File receivedPacket = File(event.path);
       String content = await receivedPacket.readAsString();
@@ -30,26 +32,34 @@ class FileBootstrapChannel extends BootstrapChannel {
       }
 
       if (indicator == "c") {
-        on(BootstrapChannelEvent.channelMetadata, ChannelMetadata(words[1], words[2], words[3]));
+        ChannelMetadata data = ChannelMetadata(words[1], words[2], words[3]);
+        debugPrint("[FileBootstrapChannel][receiver] Received channel metadata: \"$data\".");
+        on(BootstrapChannelEvent.channelMetadata, data);
       } else {
-        on(BootstrapChannelEvent.fileMetadata, FileMetadata(words[1], int.parse(words[2]), int.parse(words[3])));
+        FileMetadata data = FileMetadata(words[1], int.parse(words[2]), int.parse(words[3]));
+        debugPrint("[FileBootstrapChannel][receiver] Received file metadata: \"$data\".");
+        on(BootstrapChannelEvent.fileMetadata, data);
       }
     });
-    // TODO distinguish channel and file metadata
+    debugPrint("[FileBootstrapChannel][initReceiver] Reception end is ready.");
   }
 
   @override
   Future<void> initSender({data = const {}}) async {
     // TODO synchronize this with initReceiver (like FileDataChannel)
+    debugPrint("[FileBootstrapChannel][initSender] Start sending end initialization.");
+    debugPrint("[FileBootstrapChannel][initSender] Sending end is ready.");
   }
 
   @override
   Future<void> sendChannelMetadata(ChannelMetadata data) async {
+    debugPrint("[FileBootstrapChannel][sendChannelMetadata] Send channel metadata.");
     _createMockPacket(data, true);
   }
 
   @override
   Future<void> sendFileMetadata(FileMetadata data) async {
+    debugPrint("[FileBootstrapChannel][sendChannelMetadata] Send file metadata.");
     _createMockPacket(data, false);
   }
 

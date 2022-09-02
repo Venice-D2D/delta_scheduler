@@ -61,6 +61,7 @@ abstract class Scheduler {
     // Open all channels.
     // TODO force data channels to take a bootstrap channel as parameter
     await Future.wait(_channels.map((c) => c.initSender(data: bootstrapChannel)));
+    debugPrint("[Scheduler] All data channels are ready, data sending can start.\n");
 
     // Begin sending chunks.
     await sendChunks(_chunksQueue, _channels, _resubmissionTimers);

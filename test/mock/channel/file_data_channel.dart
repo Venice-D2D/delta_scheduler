@@ -7,6 +7,7 @@ import 'package:channel_multiplexed_scheduler/channels/implementation/bootstrap_
 import 'package:channel_multiplexed_scheduler/channels/implementation/data_channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/events/data_channel_event.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
+import 'package:flutter/material.dart';
 
 
 /// This test Channel implementation emulates a network connection by using the
@@ -24,6 +25,8 @@ class FileDataChannel extends DataChannel {
   /// from said file and sends it to the receiver.
   @override
   Future<void> initReceiver({Map<String, dynamic> parameters = const {}}) async {
+    debugPrint("[FileDataChannel][initReceiver] Start receiving end initialization.");
+
     directory.watch(events: FileSystemEvent.create).listen((event) {
       // Rebuild FileChunk instance.
       File receivedChunk = File(event.path);
@@ -46,6 +49,7 @@ class FileDataChannel extends DataChannel {
     // by sending end (which in testing environment in on the same machine as
     // receiver end).
     await Future.delayed(Duration(milliseconds: Random().nextInt(1000)));
+    debugPrint("[FileDataChannel][initReceiver] Reception end is ready.");
     File chunkFile = File("${directory.path}${Platform.pathSeparator}receiverIsReady");
     chunkFile.createSync();
   }
@@ -57,6 +61,7 @@ class FileDataChannel extends DataChannel {
   /// directory.
   @override
   Future<void> initSender({data = const {}}) async {
+    debugPrint("[FileDataChannel][initSender] Start sending end initialization.");
     bool isReceiverReady = false;
 
     StreamSubscription stream = directory.watch(events: FileSystemEvent.create).listen((event) {
@@ -80,6 +85,7 @@ class FileDataChannel extends DataChannel {
     });
 
     stream.cancel();
+    debugPrint("[FileDataChannel][initSender] Sending end is ready.");
   }
 
   /// Simulates sending chunks over network by writing them down in a directory
