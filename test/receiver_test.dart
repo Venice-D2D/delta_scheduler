@@ -33,7 +33,12 @@ void main() {
     // so this would never end...
     receiver.receiveFile(destination);
 
-    expect(channel1.isInitReceiver, true);
-    expect(channel2.isInitReceiver, true);
+    // Since receiver waits for data from bootstrap channel to initialize
+    // channels, we leave it some time before checking if channels are indeed
+    // initialized.
+    await Future.delayed(const Duration(milliseconds: 500), () {
+      expect(channel1.isInitReceiver, true);
+      expect(channel2.isInitReceiver, true);
+    });
   });
 }
