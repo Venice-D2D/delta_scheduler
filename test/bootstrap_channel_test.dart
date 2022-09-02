@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:channel_multiplexed_scheduler/channels/channel_metadata.dart';
 import 'package:channel_multiplexed_scheduler/channels/events/bootstrap_channel_event.dart';
 import 'package:channel_multiplexed_scheduler/channels/implementation/bootstrap_channel.dart';
 import 'package:channel_multiplexed_scheduler/file/file_metadata.dart';
@@ -45,6 +46,37 @@ void main() {
 
     // Wait for packet to be received.
     while (!received) {
+      await Future.delayed(const Duration(milliseconds: 100));
+    }
+  });
+
+  test("should exchange channel data between sending and receiving ends", () async {
+    ChannelMetadata sentData1 = ChannelMetadata("address", "identifier", "password");
+    ChannelMetadata sentData2 = ChannelMetadata("address2", "identifier2", "password2");
+    bool received1 = false;
+    bool received2 = false;
+
+    // When receiving packet, check if contained data is correct.
+    bootstrapReceivingChannel.on = (BootstrapChannelEvent event, dynamic data) {
+      if (data is! ChannelMetadata) {
+        throw TestFailure("Received data that is not of ChannelMetadata type.");
+      }
+      ChannelMetadata receivedData = data;
+      if (receivedData.identifier == "identifier") {
+        expect(receivedData, sentData1);
+        received1 = true;
+      } else {
+        expect(receivedData, sentData2);
+        received2 = true;
+      }
+    };
+
+    // Send test packets.
+    bootstrapSendingChannel.sendChannelMetadata(sentData1);
+    bootstrapSendingChannel.sendChannelMetadata(sentData2);
+
+    // Wait for packet to be received.
+    while (!received1 || !received2) {
       await Future.delayed(const Duration(milliseconds: 100));
     }
   });
