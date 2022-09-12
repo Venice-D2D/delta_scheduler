@@ -23,6 +23,15 @@ void main() {
               && e.message == 'Cannot receive file because receiver has no channel.')));
   });
 
+  test('should throw with incorrect destination', () {
+    MockDataChannel channel1 = MockDataChannel();
+    receiver.useChannel(channel1);
+
+    expect(() async => await receiver.receiveFile(Directory('/this/path/does/not/exist')),
+        throwsA(predicate((e) => e is ArgumentError
+            && e.message == 'Destination directory does not exist.')));
+  });
+
   test('should init channels', () async {
     MockDataChannel channel1 = MockDataChannel();
     MockDataChannel channel2 = MockDataChannel();
