@@ -14,7 +14,10 @@ class Receiver {
   final BootstrapChannel bootstrapChannel;
   late final List<Channel> _channels = [];
   final Map<int, FileChunk> _chunks = {};
-  int _chunksCount = 9; // TODO handle this from scheduler through a channel
+
+  // Number of chunks we expect to receive.
+  // Receiver will not end while it has not received expected chunks count.
+  int _chunksCount = 0;
 
   Receiver(this.bootstrapChannel);
 
