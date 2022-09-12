@@ -5,7 +5,7 @@ import 'dart:math';
 
 import 'package:channel_multiplexed_scheduler/channels/channel_metadata.dart';
 import 'package:channel_multiplexed_scheduler/channels/events/bootstrap_channel_event.dart';
-import 'package:channel_multiplexed_scheduler/channels/bootstrap_channel.dart';
+import 'package:channel_multiplexed_scheduler/channels/abstractions/bootstrap_channel.dart';
 import 'package:channel_multiplexed_scheduler/file/file_metadata.dart';
 import 'package:flutter/material.dart';
 
