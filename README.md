@@ -37,6 +37,10 @@ Any technology able to carry data can be implemented into a channel!
 Yeah, [even sound](https://developers.google.com/android/reference/com/google/android/gms/nearby/messages/audio/AudioBytes)!
 (don't try this at home)
 
+There are two types of channel:
+* **DataChannel**: they are used to transfer file chunks between devices;
+* **BootstrapChannel**: they are used to communicate about *DataChannel* credentials.
+
 #### Receiver
 
 Receiver is plugged to the same channels as the scheduler, and after collecting all file chunks, it 
