@@ -3,9 +3,9 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:async/async.dart';
-import 'package:channel_multiplexed_scheduler/channels/implementation/bootstrap_channel.dart';
-import 'package:channel_multiplexed_scheduler/channels/implementation/data_channel.dart';
+import 'package:channel_multiplexed_scheduler/channels/bootstrap_channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/events/data_channel_event.dart';
+import 'package:channel_multiplexed_scheduler/channels/data_channel.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 import 'package:channel_multiplexed_scheduler/file/file_metadata.dart';
 import 'package:flutter/material.dart';
@@ -59,8 +59,7 @@ abstract class Scheduler {
     );
     
     // Open all channels.
-    // TODO force data channels to take a bootstrap channel as parameter
-    await Future.wait(_channels.map((c) => c.initSender(data: bootstrapChannel)));
+    await Future.wait(_channels.map((c) => c.initSender( bootstrapChannel )));
     debugPrint("[Scheduler] All data channels are ready, data sending can start.\n");
 
     // Begin sending chunks.

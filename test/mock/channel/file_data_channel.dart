@@ -3,9 +3,10 @@ import 'dart:io';
 import 'dart:math';
 
 import 'package:channel_multiplexed_scheduler/channels/channel_metadata.dart';
-import 'package:channel_multiplexed_scheduler/channels/implementation/bootstrap_channel.dart';
-import 'package:channel_multiplexed_scheduler/channels/implementation/data_channel.dart';
+import 'package:channel_multiplexed_scheduler/channels/bootstrap_channel.dart';
+import 'package:channel_multiplexed_scheduler/channels/data_channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/events/data_channel_event.dart';
+import 'package:channel_multiplexed_scheduler/channels/data_channel.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 import 'package:flutter/material.dart';
 
@@ -24,7 +25,7 @@ class FileDataChannel extends DataChannel {
   /// When a file is created in target directory, this reconstructs file chunk
   /// from said file and sends it to the receiver.
   @override
-  Future<void> initReceiver({Map<String, dynamic> parameters = const {}}) async {
+  Future<void> initReceiver(ChannelMetadata data) async {
     debugPrint("[FileDataChannel][initReceiver] Start receiving end initialization.");
 
     directory.watch(events: FileSystemEvent.create).listen((event) {
@@ -60,7 +61,7 @@ class FileDataChannel extends DataChannel {
   /// Reception end will tell it's ready by creating a file in the watched
   /// directory.
   @override
-  Future<void> initSender({data = const {}}) async {
+  Future<void> initSender(BootstrapChannel channel) async {
     debugPrint("[FileDataChannel][initSender] Start sending end initialization.");
     bool isReceiverReady = false;
 
@@ -73,9 +74,8 @@ class FileDataChannel extends DataChannel {
     });
 
     // Simulate sending channel information to receiving end.
-    BootstrapChannel channel = data;
     await channel.sendChannelMetadata(
-        ChannelMetadata("176.122.202.107", "fileDataChannel", "3d91a583")
+        ChannelMetadata("176.122.202.107", "FileDataChannel", "3d91a583")
     );
 
     // If receiver end is not ready, we wait a bit.

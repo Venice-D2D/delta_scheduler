@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:channel_multiplexed_scheduler/channels/channel_metadata.dart';
 import 'package:channel_multiplexed_scheduler/channels/events/bootstrap_channel_event.dart';
-import 'package:channel_multiplexed_scheduler/channels/implementation/bootstrap_channel.dart';
+import 'package:channel_multiplexed_scheduler/channels/bootstrap_channel.dart';
 import 'package:channel_multiplexed_scheduler/file/file_metadata.dart';
 import 'package:flutter_test/flutter_test.dart';
 

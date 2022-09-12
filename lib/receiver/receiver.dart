@@ -1,18 +1,17 @@
 import 'dart:io';
 
-import 'package:channel_multiplexed_scheduler/channels/channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/channel_metadata.dart';
 import 'package:channel_multiplexed_scheduler/channels/events/bootstrap_channel_event.dart';
-import 'package:channel_multiplexed_scheduler/channels/implementation/bootstrap_channel.dart';
-import 'package:channel_multiplexed_scheduler/channels/implementation/data_channel.dart';
+import 'package:channel_multiplexed_scheduler/channels/bootstrap_channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/events/data_channel_event.dart';
+import 'package:channel_multiplexed_scheduler/channels/data_channel.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 import 'package:channel_multiplexed_scheduler/file/file_metadata.dart';
 
 
 class Receiver {
   final BootstrapChannel bootstrapChannel;
-  late final List<Channel> _channels = [];
+  late final List<DataChannel> _channels = [];
   final Map<int, FileChunk> _chunks = {};
 
   /// Number of chunks we expect to receive.
@@ -62,9 +61,7 @@ class Receiver {
           // Open all channels.
           ChannelMetadata channelMetadata = data;
           // TODO add a channel identifier, not to send all metadata to all channels
-          await Future.wait(_channels.map((c) => c.initReceiver(
-            parameters: {"data": channelMetadata}
-          )));
+          await Future.wait(_channels.map((c) => c.initReceiver( channelMetadata )));
           allChannelsInitialized = true;
           break;
       }

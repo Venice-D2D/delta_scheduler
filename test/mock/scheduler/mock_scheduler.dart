@@ -1,5 +1,6 @@
 import 'package:async/async.dart';
-import 'package:channel_multiplexed_scheduler/channels/implementation/data_channel.dart';
+import 'package:channel_multiplexed_scheduler/channels/data_channel.dart';
+import 'package:channel_multiplexed_scheduler/channels/data_channel.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 import 'package:channel_multiplexed_scheduler/scheduler/scheduler.dart';
 import 'package:flutter/material.dart';

@@ -1,7 +1,10 @@
 import 'dart:math';
 
-import 'package:channel_multiplexed_scheduler/channels/implementation/data_channel.dart';
+import 'package:channel_multiplexed_scheduler/channels/channel_metadata.dart';
+import 'package:channel_multiplexed_scheduler/channels/bootstrap_channel.dart';
+import 'package:channel_multiplexed_scheduler/channels/data_channel.dart';
 import 'package:channel_multiplexed_scheduler/channels/events/data_channel_event.dart';
+import 'package:channel_multiplexed_scheduler/channels/data_channel.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 import 'package:flutter/material.dart';
 
@@ -17,12 +20,12 @@ class MockDataChannel extends DataChannel {
 
 
   @override
-  Future<void> initSender({data = const {}}) async {
+  Future<void> initSender(BootstrapChannel channel) async {
     isInitSender = true;
   }
 
   @override
-  Future<void> initReceiver({Map<String, dynamic> parameters = const {}}) async {
+  Future<void> initReceiver(ChannelMetadata data) async {
     isInitReceiver = true;
   }
 
