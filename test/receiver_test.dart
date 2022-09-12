@@ -24,7 +24,7 @@ void main() {
   });
 
   test('should throw with incorrect destination', () {
-    MockDataChannel channel1 = MockDataChannel();
+    MockDataChannel channel1 = MockDataChannel(identifier: "mock_data_channel");
     receiver.useChannel(channel1);
 
     expect(() async => await receiver.receiveFile(Directory('/this/path/does/not/exist')),
@@ -33,8 +33,8 @@ void main() {
   });
 
   test('should init channels', () async {
-    MockDataChannel channel1 = MockDataChannel();
-    MockDataChannel channel2 = MockDataChannel();
+    MockDataChannel channel1 = MockDataChannel(identifier: "mock_data_channel_1");
+    MockDataChannel channel2 = MockDataChannel(identifier: "mock_data_channel_2");
     receiver.useChannel(channel1);
     receiver.useChannel(channel2);
 

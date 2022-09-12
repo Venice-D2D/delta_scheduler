@@ -83,8 +83,8 @@ void main() {
     });
 
     test('should init channels', () async {
-      MockDataChannel channel1 = MockDataChannel();
-      MockDataChannel channel2 = MockDataChannel();
+      MockDataChannel channel1 = MockDataChannel(identifier: "mock_data_channel_1");
+      MockDataChannel channel2 = MockDataChannel(identifier: "mock_data_channel_2");
       scheduler.useChannel(channel1);
       scheduler.useChannel(channel2);
 
@@ -95,8 +95,8 @@ void main() {
     });
 
     test('should send all chunks through first channel with test strategy', () async {
-      MockDataChannel channel1 = MockDataChannel();
-      MockDataChannel channel2 = MockDataChannel();
+      MockDataChannel channel1 = MockDataChannel(identifier: "mock_data_channel_1");
+      MockDataChannel channel2 = MockDataChannel(identifier: "mock_data_channel_2");
       scheduler.useChannel(channel1);
       scheduler.useChannel(channel2);
 
@@ -110,7 +110,7 @@ void main() {
     });
 
     test('should send all chunks even if some are dropped', () async {
-      MockDataChannel channel = MockDataChannel(shouldDropChunks: true);
+      MockDataChannel channel = MockDataChannel(identifier: "mock_data_channel", shouldDropChunks: true);
 
       scheduler.useChannel(channel);
       await scheduler.sendFile(file, 100000);

@@ -40,11 +40,11 @@ void main() {
     chunksFilesDir.createSync();
 
     // sending part
-    DataChannel sendChannel = FileDataChannel(directory: chunksFilesDir);
+    DataChannel sendChannel = FileDataChannel(directory: chunksFilesDir, identifier: "file_data_channel");
     scheduler.useChannel(sendChannel);
 
     // receiving end
-    DataChannel receiveChannel = FileDataChannel(directory: chunksFilesDir);
+    DataChannel receiveChannel = FileDataChannel(directory: chunksFilesDir, identifier: "file_data_channel");
     receiver.useChannel(receiveChannel);
 
     // Wait for both data sending and reception to end.

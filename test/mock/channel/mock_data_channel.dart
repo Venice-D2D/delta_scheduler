@@ -15,7 +15,7 @@ class MockDataChannel extends DataChannel {
   bool isInitReceiver = false;
   List<int> sentChunksIds = [];
 
-  MockDataChannel({this.shouldDropChunks = false});
+  MockDataChannel({required String identifier, this.shouldDropChunks = false}) : super(identifier);
 
 
   @override

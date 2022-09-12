@@ -18,7 +18,7 @@ class FileDataChannel extends DataChannel {
   // This file name is used to synchronize receiving and sending ends.
   final String receiverReadyFileName = "receiverIsReady";
 
-  FileDataChannel({required this.directory});
+  FileDataChannel({required this.directory, required String identifier}) : super(identifier);
 
 
   /// When a file is created in target directory, this reconstructs file chunk

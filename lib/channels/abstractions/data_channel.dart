@@ -4,6 +4,12 @@ import 'package:channel_multiplexed_scheduler/channels/abstractions/bootstrap_ch
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 
 abstract class DataChannel {
+  /// Identifies the current channel in a unique fashion.
+  /// This must have the same value on both receiving and sending ends, so that
+  /// channel metadata from sender is forwarded to corresponding receiver only.
+  final String identifier;
+  DataChannel(this.identifier);
+
   /// Provides information to sending and receiving ends about what's happening
   /// in the current channel.
   late Function(DataChannelEvent event, dynamic data) on;
