@@ -22,6 +22,7 @@ abstract class Scheduler {
 
   /// Adds a channel to be used to send file chunks.
   void useChannel(DataChannel channel) {
+    // TODO check if channel identifier is not already used
     _channels.add(channel);
     channel.on = (DataChannelEvent event, dynamic data) {
       switch (event) {

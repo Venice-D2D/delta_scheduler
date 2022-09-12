@@ -27,6 +27,7 @@ class Receiver {
 
   /// Adds a channel to use to receive data.
   void useChannel(DataChannel channel) {
+    // TODO check if channel identifier is not already used
     _channels.add(channel);
     channel.on = (DataChannelEvent event, dynamic data) {
       FileChunk chunk = data;
@@ -61,6 +62,8 @@ class Receiver {
           // Open all channels.
           ChannelMetadata channelMetadata = data;
           // TODO add a channel identifier, not to send all metadata to all channels
+          // TODO set allChannelsInitialized to true once all channels have been initialized
+          // TODO throw if corresponding channel end was not found
           await Future.wait(_channels.map((c) => c.initReceiver( channelMetadata )));
           allChannelsInitialized = true;
           break;

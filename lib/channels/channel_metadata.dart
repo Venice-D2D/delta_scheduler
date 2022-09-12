@@ -1,3 +1,4 @@
+// TODO add channel identifier
 class ChannelMetadata {
   final String address;
   final String identifier;
