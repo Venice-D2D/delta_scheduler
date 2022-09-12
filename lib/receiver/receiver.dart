@@ -17,7 +17,7 @@ class Receiver {
 
   // Number of chunks we expect to receive.
   // Receiver will not end while it has not received expected chunks count.
-  int _chunksCount = 0;
+  late int _chunksCount;
 
   /// Name of the file that will be created by the received.
   /// It is transmitted through the bootstrap channel.
