@@ -45,7 +45,7 @@ class Receiver {
     }
 
     if (!destination.existsSync()) {
-      throw StateError('Destination directory does not exist.');
+      throw ArgumentError('Destination directory does not exist.');
     }
 
     // Open bootstrap channel.
