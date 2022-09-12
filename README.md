@@ -47,6 +47,16 @@ Receiver is plugged to the same channels as the scheduler, and after collecting 
 rebuilds the file.
 
 
+## Data exchange sequence
+
+<p align="center">
+  <img src="assets/img/Sequence%20diagram.drawio.png"/>
+</p>
+
+To avoid the struggle of manually configuring data channels on receiving end, we can use bootstrap
+channels: they will send configuration information to the receiver, which will use it to open data
+channels, being then ready to receive file chunks.
+
 ## Implementation
 
 ### Scheduler implementation
