@@ -15,8 +15,8 @@ class Receiver {
   late final List<Channel> _channels = [];
   final Map<int, FileChunk> _chunks = {};
 
-  // Number of chunks we expect to receive.
-  // Receiver will not end while it has not received expected chunks count.
+  /// Number of chunks we expect to receive.
+  /// Receiver will not end while it has not received expected chunks count.
   late int _chunksCount;
 
   /// Name of the file that will be created by the received.
