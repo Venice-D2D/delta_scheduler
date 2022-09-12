@@ -8,10 +8,10 @@ import 'mock/channel/mock_data_channel.dart';
 
 void main() {
   late Receiver receiver;
-  late String destination;
+  late Directory destination;
 
   setUpAll(() {
-    destination = "${Directory.systemTemp.path}${Platform.pathSeparator}received.pdf";
+    destination = Directory("${Directory.systemTemp.path}${Platform.pathSeparator}");
   });
   setUp(() {
     receiver = Receiver( MockBootstrapChannel() );

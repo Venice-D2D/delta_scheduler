@@ -16,12 +16,12 @@ void main() {
   late BootstrapChannel bootstrapSendingChannel;
   late BootstrapChannel bootstrapReceivingChannel;
   late File file;
-  late String destination;
+  late Directory destination;
   final int currentTime = DateTime.now().millisecondsSinceEpoch;
 
   setUpAll(() {
     file = File('test/assets/paper.pdf');
-    destination = "${Directory.systemTemp.path}${Platform.pathSeparator}received.pdf";
+    destination = Directory("${Directory.systemTemp.path}${Platform.pathSeparator}");
   });
   setUp(() {
     // we use temporary storage to act as network for bootstrap channel
@@ -53,7 +53,7 @@ void main() {
       scheduler.sendFile(file, 100000)
     ]);
     
-    File receivedFile = File(destination);
+    File receivedFile = File(destination.path+Platform.pathSeparator+file.uri.pathSegments.last);
     expect(receivedFile.existsSync(), true);
     expect(receivedFile.lengthSync() != 0, true);
   });

@@ -19,6 +19,10 @@ class Receiver {
   // Receiver will not end while it has not received expected chunks count.
   int _chunksCount = 0;
 
+  /// Name of the file that will be created by the received.
+  /// It is transmitted through the bootstrap channel.
+  late String _filename;
+
   Receiver(this.bootstrapChannel);
 
 
@@ -32,7 +36,7 @@ class Receiver {
   }
 
   /// Receives a file through available channels.
-  Future<void> receiveFile(String destination) async {
+  Future<void> receiveFile(Directory destination) async {
     bool allChannelsInitialized = false;
     bool fileMetadataReceived = false;
 
@@ -40,13 +44,17 @@ class Receiver {
       throw StateError('Cannot receive file because receiver has no channel.');
     }
 
+    if (!destination.existsSync()) {
+      throw StateError('Destination directory does not exist.');
+    }
+
     // Open bootstrap channel.
     bootstrapChannel.on = (BootstrapChannelEvent event, dynamic data) async {
       switch(event) {
         case BootstrapChannelEvent.fileMetadata:
-          // TODO use file name
           // TODO use chunk size
           FileMetadata fileMetadata = data;
+          _filename = fileMetadata.name;
           _chunksCount = fileMetadata.chunkCount;
           fileMetadataReceived = true;
           break;
@@ -73,7 +81,7 @@ class Receiver {
     await receiveAllChunks();
 
     // Fill destination file with received chunks.
-    File newFile = File(destination);
+    File newFile = File(destination.path+Platform.pathSeparator+_filename);
     if (newFile.existsSync()) {
       newFile.deleteSync();
     }
