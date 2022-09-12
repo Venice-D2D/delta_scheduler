@@ -32,6 +32,17 @@ void main() {
             && e.message == 'Destination directory does not exist.')));
   });
 
+  test('should throw when using 2 channels with same identifier', () {
+    final String identifier = "mock_data_channel";
+    MockDataChannel channel1 = MockDataChannel(identifier: identifier);
+    MockDataChannel channel2 = MockDataChannel(identifier: identifier);
+    receiver.useChannel(channel1);
+
+    expect(() => receiver.useChannel(channel2),
+        throwsA(predicate((e) => e is StateError
+            && e.message == 'Channel identifier "$identifier" is already used.')));
+  });
+
   test('should init channels', () async {
     MockDataChannel channel1 = MockDataChannel(identifier: "mock_data_channel_1");
     MockDataChannel channel2 = MockDataChannel(identifier: "mock_data_channel_2");
