@@ -64,14 +64,22 @@ class Receiver {
         case BootstrapChannelEvent.channelMetadata:
           // Open all channels.
           ChannelMetadata channelMetadata = data;
-          // TODO add a channel identifier, not to send all metadata to all channels
           // TODO set allChannelsInitialized to true once all channels have been initialized
-          // TODO throw if corresponding channel end was not found
-          await Future.wait(_channels.map((c) => c.initReceiver( channelMetadata )));
+
+          // Get matching channel to only send data to it, and not other channels.
+          DataChannel matchingChannel = _channels.firstWhere((element) =>
+              element.identifier == channelMetadata.channelIdentifier,
+              orElse: () => throw Exception(
+                  'No channel with identifier "${channelMetadata.channelIdentifier}" was found in receiver channels.')
+          );
+          await matchingChannel.initReceiver(channelMetadata);
+
           allChannelsInitialized = true;
+
           break;
       }
     };
+
     await bootstrapChannel.initReceiver();
 
     // Wait for bootstrap channel to receive channel information and initialize
