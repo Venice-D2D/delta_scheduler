@@ -57,4 +57,29 @@ void main() {
     expect(receivedFile.existsSync(), true);
     expect(receivedFile.lengthSync() != 0, true);
   });
+
+  test('receiver should throw when receiving channel metadata matching no channel', () async {
+    // we use temporary storage to act as network
+    Directory chunksFilesDir = Directory(Directory.systemTemp.path + Platform.pathSeparator + (currentTime+1).toString());
+    chunksFilesDir.createSync();
+
+    const String id = "file_data_channel";
+
+    // sending part
+    DataChannel sendChannel = FileDataChannel(directory: chunksFilesDir, identifier: id);
+    scheduler.useChannel(sendChannel);
+
+    // receiving end (but with no matching identifier)
+    DataChannel receiveChannel = FileDataChannel(directory: chunksFilesDir, identifier: "file_data_channel_2");
+    receiver.useChannel(receiveChannel);
+
+    expect(() async {
+        await Future.wait([
+          receiver.receiveFile(destination),
+          scheduler.sendFile(file, 100000)
+        ]);
+      },
+      throwsA(predicate((e) => e is ArgumentError
+          && e.message == 'No channel with identifier "$id" was found in receiver channels.')));
+  });
 }
