@@ -27,7 +27,10 @@ class Receiver {
 
   /// Adds a channel to use to receive data.
   void useChannel(DataChannel channel) {
-    // TODO check if channel identifier is not already used
+    if (_channels.where((element) => element.identifier == channel.identifier).isNotEmpty) {
+      throw StateError('Channel identifier "${channel.identifier}" is already used.');
+    }
+    
     _channels.add(channel);
     channel.on = (DataChannelEvent event, dynamic data) {
       FileChunk chunk = data;
