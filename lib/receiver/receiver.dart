@@ -28,7 +28,7 @@ class Receiver {
   /// Adds a channel to use to receive data.
   void useChannel(DataChannel channel) {
     if (_channels.where((element) => element.identifier == channel.identifier).isNotEmpty) {
-      throw StateError('Channel identifier "${channel.identifier}" is already used.');
+      throw ArgumentError('Channel identifier "${channel.identifier}" is already used.');
     }
     
     _channels.add(channel);

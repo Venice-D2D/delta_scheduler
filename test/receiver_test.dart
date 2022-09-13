@@ -39,7 +39,7 @@ void main() {
     receiver.useChannel(channel1);
 
     expect(() => receiver.useChannel(channel2),
-        throwsA(predicate((e) => e is StateError
+        throwsA(predicate((e) => e is ArgumentError
             && e.message == 'Channel identifier "$identifier" is already used.')));
   });
 
