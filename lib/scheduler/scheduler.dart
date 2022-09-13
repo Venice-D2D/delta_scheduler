@@ -22,7 +22,10 @@ abstract class Scheduler {
 
   /// Adds a channel to be used to send file chunks.
   void useChannel(DataChannel channel) {
-    // TODO check if channel identifier is not already used
+    if (_channels.where((element) => element.identifier == channel.identifier).isNotEmpty) {
+      throw ArgumentError('Channel identifier "${channel.identifier}" is already used.');
+    }
+    
     _channels.add(channel);
     channel.on = (DataChannelEvent event, dynamic data) {
       switch (event) {
