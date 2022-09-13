@@ -2,6 +2,12 @@ import 'package:channel_multiplexed_scheduler/channels/channel_metadata.dart';
 import 'package:channel_multiplexed_scheduler/channels/events/bootstrap_channel_event.dart';
 import 'package:channel_multiplexed_scheduler/file/file_metadata.dart';
 
+
+/// A bootstrap channel is a channel that carries information about
+/// data channels from sender to receiver.
+///
+/// Its connection between both ends must be done without having to share
+/// credentials over the network.
 abstract class BootstrapChannel {
   /// Provides information to sending and receiving ends about what's happening
   /// in the current channel.

@@ -3,8 +3,14 @@ import 'package:channel_multiplexed_scheduler/channels/events/data_channel_event
 import 'package:channel_multiplexed_scheduler/channels/abstractions/bootstrap_channel.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 
+
+/// A data channel is a channel that carries file data from sender to receiver.
+///
+/// It uses a bootstrap channel to transmit connection information from sender
+/// end to receiver end.
 abstract class DataChannel {
   /// Identifies the current channel in a unique fashion.
+  ///
   /// This must have the same value on both receiving and sending ends, so that
   /// channel metadata from sender is forwarded to corresponding receiver only.
   final String identifier;
