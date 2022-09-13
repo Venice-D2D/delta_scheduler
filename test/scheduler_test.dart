@@ -26,6 +26,19 @@ void main() {
   });
 
 
+  group('useChannel', () {
+    test('should throw when using 2 channels with same identifier', () {
+      const String identifier = "mock_data_channel";
+      MockDataChannel channel1 = MockDataChannel(identifier: identifier);
+      MockDataChannel channel2 = MockDataChannel(identifier: identifier);
+      scheduler.useChannel(channel1);
+
+      expect(() => scheduler.useChannel(channel2),
+          throwsA(predicate((e) => e is ArgumentError
+              && e.message == 'Channel identifier "$identifier" is already used.')));
+      });
+  });
+
   group('splitFile', () {
     test("should split file into chunks", () {
       int chunksize = 1000;
