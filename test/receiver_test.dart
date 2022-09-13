@@ -33,7 +33,7 @@ void main() {
   });
 
   test('should throw when using 2 channels with same identifier', () {
-    final String identifier = "mock_data_channel";
+    const String identifier = "mock_data_channel";
     MockDataChannel channel1 = MockDataChannel(identifier: identifier);
     MockDataChannel channel2 = MockDataChannel(identifier: identifier);
     receiver.useChannel(channel1);
