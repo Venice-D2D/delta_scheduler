@@ -1,21 +1,21 @@
 // TODO add channel identifier
 class ChannelMetadata {
   final String address;
-  final String identifier;
+  final String apIdentifier;
   final String password;
 
-  ChannelMetadata(this.address, this.identifier, this.password);
+  ChannelMetadata(this.address, this.apIdentifier, this.password);
 
   @override
   String toString() {
-    return "$address;$identifier;$password";
+    return "$address;$apIdentifier;$password";
   }
 
   @override
   bool operator ==(Object other) {
-    return other is ChannelMetadata && address == other.address && identifier == other.identifier && password == other.password;
+    return other is ChannelMetadata && address == other.address && apIdentifier == other.apIdentifier && password == other.password;
   }
 
   @override
-  int get hashCode => Object.hash(address, identifier, password);
+  int get hashCode => Object.hash(address, apIdentifier, password);
 }

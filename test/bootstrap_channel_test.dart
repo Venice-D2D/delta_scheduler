@@ -62,7 +62,7 @@ void main() {
         throw TestFailure("Received data that is not of ChannelMetadata type.");
       }
       ChannelMetadata receivedData = data;
-      if (receivedData.identifier == "identifier") {
+      if (receivedData.apIdentifier == "identifier") {
         expect(receivedData, sentData1);
         received1 = true;
       } else {
