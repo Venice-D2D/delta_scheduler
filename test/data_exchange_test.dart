@@ -40,11 +40,11 @@ void main() {
     chunksFilesDir.createSync();
 
     // sending part
-    DataChannel sendChannel = FileDataChannel(directory: chunksFilesDir, identifier: "file_data_channel");
+    DataChannel sendChannel = FileDataChannel(directory: chunksFilesDir);
     scheduler.useChannel(sendChannel);
 
     // receiving end
-    DataChannel receiveChannel = FileDataChannel(directory: chunksFilesDir, identifier: "file_data_channel");
+    DataChannel receiveChannel = FileDataChannel(directory: chunksFilesDir);
     receiver.useChannel(receiveChannel);
 
     // Wait for both data sending and reception to end.
@@ -80,6 +80,8 @@ void main() {
         ]);
       },
       throwsA(predicate((e) => e is ArgumentError
-          && e.message == 'No channel with identifier "$id" was found in receiver channels.')));
+          && e.message == 'No channel with identifier "$id" was found in receiver channels.')
+      )
+    );
   });
 }

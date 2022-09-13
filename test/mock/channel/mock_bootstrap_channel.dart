@@ -4,9 +4,21 @@ import 'package:channel_multiplexed_scheduler/channels/abstractions/bootstrap_ch
 import 'package:channel_multiplexed_scheduler/file/file_metadata.dart';
 
 class MockBootstrapChannel extends BootstrapChannel {
+  static const String mockChannelId1 = "mock_data_channel_1";
+  static const String mockChannelId2 = "mock_data_channel_2";
+
+  /// Some tests require to initialize several channels, this parameter allows
+  /// to send multiple metadata if needed.
+  final int dataChannelsCount;
+
+  MockBootstrapChannel({this.dataChannelsCount = 1});
+
   @override
   Future<void> initReceiver({Map<String, dynamic> parameters = const {}}) async {
-    on(BootstrapChannelEvent.channelMetadata, ChannelMetadata("mock_channel", "address", "identifier", "password"));
+    on(BootstrapChannelEvent.channelMetadata, ChannelMetadata(mockChannelId1, "address", "identifier", "password"));
+    if (dataChannelsCount == 2) {
+      on(BootstrapChannelEvent.channelMetadata, ChannelMetadata(mockChannelId2, "address2", "identifier2", "password2"));
+    }
   }
 
   @override

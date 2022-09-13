@@ -14,7 +14,7 @@ void main() {
     destination = Directory("${Directory.systemTemp.path}${Platform.pathSeparator}");
   });
   setUp(() {
-    receiver = Receiver( MockBootstrapChannel() );
+    receiver = Receiver( MockBootstrapChannel(dataChannelsCount: 2) );
   });
 
   test('should throw when receiving file with no channel', () {
@@ -44,8 +44,8 @@ void main() {
   });
 
   test('should init channels', () async {
-    MockDataChannel channel1 = MockDataChannel(identifier: "mock_data_channel_1");
-    MockDataChannel channel2 = MockDataChannel(identifier: "mock_data_channel_2");
+    MockDataChannel channel1 = MockDataChannel(identifier: MockBootstrapChannel.mockChannelId1);
+    MockDataChannel channel2 = MockDataChannel(identifier: MockBootstrapChannel.mockChannelId2);
     receiver.useChannel(channel1);
     receiver.useChannel(channel2);
 

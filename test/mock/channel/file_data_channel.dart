@@ -18,7 +18,9 @@ class FileDataChannel extends DataChannel {
   // This file name is used to synchronize receiving and sending ends.
   final String receiverReadyFileName = "receiverIsReady";
 
-  FileDataChannel({required this.directory, required String identifier}) : super(identifier);
+  FileDataChannel({required this.directory, String identifier = FileDataChannel.channelIdentifier}) : super(identifier);
+
+  static const String channelIdentifier = "file_data_channel";
 
 
   /// When a file is created in target directory, this reconstructs file chunk
@@ -74,7 +76,7 @@ class FileDataChannel extends DataChannel {
 
     // Simulate sending channel information to receiving end.
     await channel.sendChannelMetadata(
-        ChannelMetadata("file_channel", "176.122.202.107", "FileDataChannel", "3d91a583")
+        ChannelMetadata(identifier, "176.122.202.107", "FileDataChannel", "3d91a583")
     );
 
     // If receiver end is not ready, we wait a bit.
