@@ -6,7 +6,7 @@ import 'package:channel_multiplexed_scheduler/file/file_metadata.dart';
 class MockBootstrapChannel extends BootstrapChannel {
   @override
   Future<void> initReceiver({Map<String, dynamic> parameters = const {}}) async {
-    on(BootstrapChannelEvent.channelMetadata, ChannelMetadata("address", "identifier", "password"));
+    on(BootstrapChannelEvent.channelMetadata, ChannelMetadata("mock_channel", "address", "identifier", "password"));
   }
 
   @override

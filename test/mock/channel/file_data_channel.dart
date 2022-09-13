@@ -74,7 +74,7 @@ class FileDataChannel extends DataChannel {
 
     // Simulate sending channel information to receiving end.
     await channel.sendChannelMetadata(
-        ChannelMetadata("176.122.202.107", "FileDataChannel", "3d91a583")
+        ChannelMetadata("file_channel", "176.122.202.107", "FileDataChannel", "3d91a583")
     );
 
     // If receiver end is not ready, we wait a bit.

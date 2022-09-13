@@ -51,8 +51,8 @@ void main() {
   });
 
   test("should exchange channel data between sending and receiving ends", () async {
-    ChannelMetadata sentData1 = ChannelMetadata("address", "identifier", "password");
-    ChannelMetadata sentData2 = ChannelMetadata("address2", "identifier2", "password2");
+    ChannelMetadata sentData1 = ChannelMetadata("phantom_channel", "address", "identifier", "password");
+    ChannelMetadata sentData2 = ChannelMetadata("phantom_channel", "address2", "identifier2", "password2");
     bool received1 = false;
     bool received2 = false;
 
