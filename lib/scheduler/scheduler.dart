@@ -11,6 +11,13 @@ import 'package:channel_multiplexed_scheduler/file/file_metadata.dart';
 import 'package:flutter/material.dart';
 
 
+/// The Scheduler class goal is to send a file to a Receiver instance that's
+/// located on another device.
+///
+/// To do so, it uses multiple data channels; it is responsible for their
+/// initialization, but also in the implementation of the channel choice
+/// strategy (*i.e.* in choosing which channel to use to send a given file
+/// chunk).
 abstract class Scheduler {
   final BootstrapChannel bootstrapChannel;
   late final List<DataChannel> _channels = [];
