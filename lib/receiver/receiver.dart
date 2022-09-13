@@ -9,6 +9,8 @@ import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 import 'package:channel_multiplexed_scheduler/file/file_metadata.dart';
 
 
+/// The Receiver class goal is to receive a file from a Scheduler instance
+/// that's running on another device.
 class Receiver {
   final BootstrapChannel bootstrapChannel;
   late final List<DataChannel> _channels = [];
