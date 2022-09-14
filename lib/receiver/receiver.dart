@@ -71,7 +71,7 @@ class Receiver {
           // Get matching channel to only send data to it, and not other channels.
           DataChannel matchingChannel = _channels.firstWhere((element) =>
               element.identifier == channelMetadata.channelIdentifier,
-              orElse: () => throw Exception(
+              orElse: () => throw ArgumentError(
                   'No channel with identifier "${channelMetadata.channelIdentifier}" was found in receiver channels.')
           );
           await matchingChannel.initReceiver(channelMetadata);
