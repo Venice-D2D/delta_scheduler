@@ -8,6 +8,7 @@ import 'package:channel_multiplexed_scheduler/channels/events/bootstrap_channel_
 import 'package:channel_multiplexed_scheduler/channels/abstractions/bootstrap_channel.dart';
 import 'package:channel_multiplexed_scheduler/file/file_metadata.dart';
 import 'package:flutter/material.dart';
+import 'package:uuid/uuid.dart';
 
 class FileBootstrapChannel extends BootstrapChannel {
   // This directory will store all package exchanged between sender and receiver.
@@ -28,8 +29,8 @@ class FileBootstrapChannel extends BootstrapChannel {
 
       String content = await receivedPacket.readAsString();
       List<String> words = content.split(";");
-
       final String indicator = words[0];
+
       if (![4, 5].contains(words.length)) {
         throw StateError("Received mock packet with incorrect format.");
       }
@@ -102,7 +103,7 @@ class FileBootstrapChannel extends BootstrapChannel {
       throw StateError("Tried to send mock packet with incorrect data type.");
     }
 
-    File packetFile = File(directory.path + Platform.pathSeparator + UniqueKey().toString());
+    File packetFile = File(directory.path + Platform.pathSeparator + const Uuid().v1());
     await packetFile.create();
 
     String packetContent = content.toString();
