@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:channel_multiplexed_scheduler/channels/abstractions/bootstrap_channel.dart';
@@ -73,15 +74,22 @@ void main() {
     DataChannel receiveChannel = FileDataChannel(directory: chunksFilesDir, identifier: "file_data_channel_2");
     receiver.useChannel(receiveChannel);
 
-    expect(() async {
-        await Future.wait([
-          receiver.receiveFile(destination),
-          scheduler.sendFile(file, 100000)
-        ]);
-      },
-      throwsA(predicate((e) => e is ArgumentError
-          && e.message == 'No channel with identifier "$id" was found in receiver channels.')
-      )
-    );
+    scheduler.sendFile(file, 100000);
+
+    // run receiving end in a guarded zone to catch asynchronous error
+    bool gotError = false;
+
+    runZonedGuarded(() async {
+      await receiver.receiveFile(destination);
+    }, (error, stack) {
+      gotError = true;
+      expect(error is ArgumentError, true);
+      expect((error as ArgumentError).message, 'No channel with identifier "$id" was found in receiver channels.');
+    });
+
+    // wait until an error got thrown
+    while (!gotError) {
+      await Future.delayed(const Duration(milliseconds: 200));
+    }
   });
 }
