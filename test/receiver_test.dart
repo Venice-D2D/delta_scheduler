@@ -3,17 +3,18 @@ import 'dart:io';
 import 'package:channel_multiplexed_scheduler/receiver/receiver.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'mock/channel/mock_channel.dart';
+import 'mock/channel/mock_bootstrap_channel.dart';
+import 'mock/channel/mock_data_channel.dart';
 
 void main() {
   late Receiver receiver;
-  late String destination;
+  late Directory destination;
 
   setUpAll(() {
-    destination = "${Directory.systemTemp.path}${Platform.pathSeparator}received.pdf";
+    destination = Directory("${Directory.systemTemp.path}${Platform.pathSeparator}");
   });
   setUp(() {
-    receiver = Receiver();
+    receiver = Receiver( MockBootstrapChannel(dataChannelsCount: 2) );
   });
 
   test('should throw when receiving file with no channel', () {
@@ -22,9 +23,29 @@ void main() {
               && e.message == 'Cannot receive file because receiver has no channel.')));
   });
 
+  test('should throw with incorrect destination', () {
+    MockDataChannel channel1 = MockDataChannel(identifier: "mock_data_channel");
+    receiver.useChannel(channel1);
+
+    expect(() async => await receiver.receiveFile(Directory('/this/path/does/not/exist')),
+        throwsA(predicate((e) => e is ArgumentError
+            && e.message == 'Destination directory does not exist.')));
+  });
+
+  test('should throw when using 2 channels with same identifier', () {
+    const String identifier = "mock_data_channel";
+    MockDataChannel channel1 = MockDataChannel(identifier: identifier);
+    MockDataChannel channel2 = MockDataChannel(identifier: identifier);
+    receiver.useChannel(channel1);
+
+    expect(() => receiver.useChannel(channel2),
+        throwsA(predicate((e) => e is ArgumentError
+            && e.message == 'Channel identifier "$identifier" is already used.')));
+  });
+
   test('should init channels', () async {
-    MockChannel channel1 = MockChannel();
-    MockChannel channel2 = MockChannel();
+    MockDataChannel channel1 = MockDataChannel(identifier: MockBootstrapChannel.mockChannelId1);
+    MockDataChannel channel2 = MockDataChannel(identifier: MockBootstrapChannel.mockChannelId2);
     receiver.useChannel(channel1);
     receiver.useChannel(channel2);
 
@@ -32,7 +53,12 @@ void main() {
     // so this would never end...
     receiver.receiveFile(destination);
 
-    expect(channel1.isInitReceiver, true);
-    expect(channel2.isInitReceiver, true);
+    // Since receiver waits for data from bootstrap channel to initialize
+    // channels, we leave it some time before checking if channels are indeed
+    // initialized.
+    await Future.delayed(const Duration(milliseconds: 500), () {
+      expect(channel1.isInitReceiver, true);
+      expect(channel2.isInitReceiver, true);
+    });
   });
 }

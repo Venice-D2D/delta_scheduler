@@ -3,32 +3,47 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:async/async.dart';
-import 'package:channel_multiplexed_scheduler/channels/channel_event.dart';
+import 'package:channel_multiplexed_scheduler/channels/abstractions/bootstrap_channel.dart';
+import 'package:channel_multiplexed_scheduler/channels/events/data_channel_event.dart';
+import 'package:channel_multiplexed_scheduler/channels/abstractions/data_channel.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
+import 'package:channel_multiplexed_scheduler/file/file_metadata.dart';
 import 'package:flutter/material.dart';
 
-import '../channels/channel.dart';
 
-
+/// The Scheduler class goal is to send a file to a Receiver instance that's
+/// located on another device.
+///
+/// To do so, it uses multiple data channels; it is responsible for their
+/// initialization, but also in the implementation of the channel choice
+/// strategy (*i.e.* in choosing which channel to use to send a given file
+/// chunk).
 abstract class Scheduler {
-  late final List<Channel> _channels = [];
+  final BootstrapChannel bootstrapChannel;
+  late final List<DataChannel> _channels = [];
   late List<FileChunk> _chunksQueue = [];
   final Map<int, CancelableOperation> _resubmissionTimers = {};
 
+  Scheduler(this.bootstrapChannel);
+
+
   /// Adds a channel to be used to send file chunks.
-  void useChannel(Channel channel) {
+  void useChannel(DataChannel channel) {
+    if (_channels.where((element) => element.identifier == channel.identifier).isNotEmpty) {
+      throw ArgumentError('Channel identifier "${channel.identifier}" is already used.');
+    }
+    
     _channels.add(channel);
-    channel.on = (ChannelEvent event, dynamic data) {
+    channel.on = (DataChannelEvent event, dynamic data) {
       switch (event) {
-        case ChannelEvent.acknowledgment:
+        case DataChannelEvent.acknowledgment:
           int chunkId = data;
           if (_resubmissionTimers.containsKey(chunkId)) {
             CancelableOperation timer = _resubmissionTimers.remove(chunkId)!;
             timer.cancel();
           }
           break;
-        case ChannelEvent.opened:
-        case ChannelEvent.data:
+        case DataChannelEvent.data:
           break;
       }
     };
@@ -47,9 +62,16 @@ abstract class Scheduler {
     }
 
     _chunksQueue = splitFile(file, chunksize);
+
+    // Open bootstrap channel and send file metadata.
+    await bootstrapChannel.initSender();
+    await bootstrapChannel.sendFileMetadata(
+        FileMetadata(file.uri.pathSegments.last, chunksize, _chunksQueue.length)
+    );
     
     // Open all channels.
-    Future.wait(_channels.map((c) => c.initSender()));
+    await Future.wait(_channels.map((c) => c.initSender( bootstrapChannel )));
+    debugPrint("[Scheduler] All data channels are ready, data sending can start.\n");
 
     // Begin sending chunks.
     await sendChunks(_chunksQueue, _channels, _resubmissionTimers);
@@ -62,7 +84,7 @@ abstract class Scheduler {
   /// to avoid finishing execution while some chunks have not been acknowledged.
   Future<void> sendChunks(
       List<FileChunk> chunks,
-      List<Channel> channels,
+      List<DataChannel> channels,
       Map<int, CancelableOperation> resubmissionTimers);
 
   /// Sends a data chunk through a specified channel.
@@ -70,7 +92,7 @@ abstract class Scheduler {
   /// If such chunk is not acknowledged within a given duration, this will put
   /// the chunk at the head of the sending queue, for it to be resent as soon
   /// as possible.
-  Future<void> sendChunk(FileChunk chunk, Channel channel) async {
+  Future<void> sendChunk(FileChunk chunk, DataChannel channel) async {
     bool acknowledged = false;
     bool timedOut = false;
 

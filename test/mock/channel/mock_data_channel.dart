@@ -1,28 +1,30 @@
 import 'dart:math';
 
-import 'package:channel_multiplexed_scheduler/channels/channel.dart';
-import 'package:channel_multiplexed_scheduler/channels/channel_event.dart';
+import 'package:channel_multiplexed_scheduler/channels/channel_metadata.dart';
+import 'package:channel_multiplexed_scheduler/channels/abstractions/bootstrap_channel.dart';
+import 'package:channel_multiplexed_scheduler/channels/abstractions/data_channel.dart';
+import 'package:channel_multiplexed_scheduler/channels/events/data_channel_event.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 import 'package:flutter/material.dart';
 
 
 /// This is a mock Channel implementation that's used in tests.
-class MockChannel extends Channel {
+class MockDataChannel extends DataChannel {
   bool shouldDropChunks;
   bool isInitSender = false;
   bool isInitReceiver = false;
   List<int> sentChunksIds = [];
 
-  MockChannel({this.shouldDropChunks = false});
+  MockDataChannel({required String identifier, this.shouldDropChunks = false}) : super(identifier);
 
 
   @override
-  Future<void> initSender() async {
+  Future<void> initSender(BootstrapChannel channel) async {
     isInitSender = true;
   }
 
   @override
-  Future<void> initReceiver() async {
+  Future<void> initReceiver(ChannelMetadata data) async {
     isInitReceiver = true;
   }
 
@@ -42,7 +44,7 @@ class MockChannel extends Channel {
       if (!sentChunksIds.contains(chunk.identifier)) {
         sentChunksIds.add(chunk.identifier);
       }
-      on(ChannelEvent.acknowledgment, chunk.identifier);
+      on(DataChannelEvent.acknowledgment, chunk.identifier);
     });
   }
 }

@@ -1,16 +1,19 @@
 import 'dart:io';
 
+import 'package:channel_multiplexed_scheduler/channels/abstractions/bootstrap_channel.dart';
 import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
 import 'package:channel_multiplexed_scheduler/scheduler/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'mock/channel/mock_channel.dart';
+import 'mock/channel/mock_bootstrap_channel.dart';
+import 'mock/channel/mock_data_channel.dart';
 import 'mock/scheduler/mock_scheduler.dart';
 
 
 void main() {
   late File file;
   late int fileLength;
+  late BootstrapChannel bootstrapChannel;
   late Scheduler scheduler;
 
   setUpAll(() {
@@ -18,9 +21,23 @@ void main() {
     fileLength = file.lengthSync();
   });
   setUp(() {
-    scheduler = MockScheduler();
+    bootstrapChannel = MockBootstrapChannel();
+    scheduler = MockScheduler( bootstrapChannel );
   });
 
+
+  group('useChannel', () {
+    test('should throw when using 2 channels with same identifier', () {
+      const String identifier = "mock_data_channel";
+      MockDataChannel channel1 = MockDataChannel(identifier: identifier);
+      MockDataChannel channel2 = MockDataChannel(identifier: identifier);
+      scheduler.useChannel(channel1);
+
+      expect(() => scheduler.useChannel(channel2),
+          throwsA(predicate((e) => e is ArgumentError
+              && e.message == 'Channel identifier "$identifier" is already used.')));
+      });
+  });
 
   group('splitFile', () {
     test("should split file into chunks", () {
@@ -79,8 +96,8 @@ void main() {
     });
 
     test('should init channels', () async {
-      MockChannel channel1 = MockChannel();
-      MockChannel channel2 = MockChannel();
+      MockDataChannel channel1 = MockDataChannel(identifier: "mock_data_channel_1");
+      MockDataChannel channel2 = MockDataChannel(identifier: "mock_data_channel_2");
       scheduler.useChannel(channel1);
       scheduler.useChannel(channel2);
 
@@ -91,8 +108,8 @@ void main() {
     });
 
     test('should send all chunks through first channel with test strategy', () async {
-      MockChannel channel1 = MockChannel();
-      MockChannel channel2 = MockChannel();
+      MockDataChannel channel1 = MockDataChannel(identifier: "mock_data_channel_1");
+      MockDataChannel channel2 = MockDataChannel(identifier: "mock_data_channel_2");
       scheduler.useChannel(channel1);
       scheduler.useChannel(channel2);
 
@@ -106,7 +123,7 @@ void main() {
     });
 
     test('should send all chunks even if some are dropped', () async {
-      MockChannel channel = MockChannel(shouldDropChunks: true);
+      MockDataChannel channel = MockDataChannel(identifier: "mock_data_channel", shouldDropChunks: true);
 
       scheduler.useChannel(channel);
       await scheduler.sendFile(file, 100000);

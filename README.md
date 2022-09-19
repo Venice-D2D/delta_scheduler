@@ -37,11 +37,25 @@ Any technology able to carry data can be implemented into a channel!
 Yeah, [even sound](https://developers.google.com/android/reference/com/google/android/gms/nearby/messages/audio/AudioBytes)!
 (don't try this at home)
 
+There are two types of channel:
+* **DataChannel**: they are used to transfer file chunks between devices;
+* **BootstrapChannel**: they are used to communicate about *DataChannel* credentials.
+
 #### Receiver
 
 Receiver is plugged to the same channels as the scheduler, and after collecting all file chunks, it 
 rebuilds the file.
 
+
+## Data exchange sequence
+
+<p align="center">
+  <img src="assets/img/Sequence%20diagram.drawio.png"/>
+</p>
+
+To avoid the struggle of manually configuring data channels on receiving end, we can use bootstrap
+channels: they will send configuration information to the receiver, which will use it to open data
+channels, being then ready to receive file chunks.
 
 ## Implementation
 
@@ -71,10 +85,10 @@ chunks have been transmitted successfully.
 ### Channel implementation
 
 ```dart
-abstract class Channel {
-  /// Provides information to the scheduler about what's happening in the
-  /// current channel.
-  late ChannelCallback on;
+abstract class BootstrapChannel {
+  /// Provides information to sending and receiving ends about what's happening
+  /// in the current channel.
+  late Function(BootstrapChannelEvent event, dynamic data) on;
 
   /// Initializes current channel, and returns when it is ready to send data.
   Future<void> initSender();
@@ -82,13 +96,46 @@ abstract class Channel {
   /// Initializes current channel, and returns when it is ready to receive data.
   Future<void> initReceiver();
 
+  /// Sends file metadata to receiving end.
+  Future<void> sendFileMetadata(FileMetadata data);
+
+  /// Sends channel metadata to receiving end, for it to initialize data
+  /// channels before starting file exchange.
+  Future<void> sendChannelMetadata(ChannelMetadata data);
+}
+```
+
+Your custom bootstrap channel must implement those four methods:
+* `initSender` will be called by the scheduler: you should include in there all code relative to
+  socket opening;
+* `initReceiver` will be called by the receiver: it should establish connection with
+  connection-opening code contained in `initSender`;
+* `sendFileMetadata` and `sendChannelMetadata` will be called by the sending end to transmit
+information to receiving end.
+
+
+```dart
+abstract class DataChannel {
+  /// Provides information to sending and receiving ends about what's happening
+  /// in the current channel.
+  late Function(DataChannelEvent event, dynamic data) on;
+
+  /// Initializes current channel, and returns when it is ready to send data.
+  /// Once sockets are ready, this must send information about them through
+  /// provided bootstrap channel.
+  Future<void> initSender(BootstrapChannel channel);
+
+  /// Initializes current channel from provided channel metadata, and returns
+  /// when it is ready to receive data.
+  Future<void> initReceiver(ChannelMetadata data);
+
   /// Sends a file piece through current channel, and returns after successful
   /// sending; this doesn't check if chunk was received.
   Future<void> sendChunk(FileChunk chunk);
 }
 ```
 
-Your custom channel must implement those three methods:
+Your custom data channel must implement those three methods:
 * `initSender` will be called by the scheduler: you should include in there all code relative to
 socket opening;
 * `initReceiver` will be called by the receiver: it should establish connection with
