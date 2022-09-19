@@ -53,6 +53,8 @@ class Receiver {
       throw ArgumentError('Destination directory does not exist.');
     }
 
+    int initializedChannels = 0;
+
     // Open bootstrap channel.
     bootstrapChannel.on = (BootstrapChannelEvent event, dynamic data) async {
       switch(event) {
@@ -66,7 +68,6 @@ class Receiver {
         case BootstrapChannelEvent.channelMetadata:
           // Open all channels.
           ChannelMetadata channelMetadata = data;
-          // TODO set allChannelsInitialized to true once all channels have been initialized
 
           // Get matching channel to only send data to it, and not other channels.
           DataChannel matchingChannel = _channels.firstWhere((element) =>
@@ -76,7 +77,11 @@ class Receiver {
           );
           await matchingChannel.initReceiver(channelMetadata);
 
-          allChannelsInitialized = true;
+          // Start receiving once all channels have been initialized.
+          initializedChannels += 1;
+          if (initializedChannels == _channels.length) {
+            allChannelsInitialized = true;
+          }
 
           break;
       }
