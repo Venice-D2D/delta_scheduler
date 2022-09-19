@@ -103,12 +103,10 @@ class FileBootstrapChannel extends BootstrapChannel {
       throw StateError("Tried to send mock packet with incorrect data type.");
     }
 
-    File packetFile = File(directory.path + Platform.pathSeparator + const Uuid().v1());
-    await packetFile.create();
-
     String packetContent = content.toString();
     String finalContent = "${content is ChannelMetadata ? "c" : "f"};$packetContent";
 
-    await packetFile.writeAsBytes(utf8.encode(finalContent));
+    File packetFile = File(directory.path + Platform.pathSeparator + const Uuid().v1());
+    packetFile.writeAsBytesSync(utf8.encode(finalContent));
   }
 }
