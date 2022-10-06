@@ -1,16 +1,7 @@
 # channel_multiplexed_scheduler
 
-This repository holds 
-**TODO UPDATE THIS DESCRIPTION**
-
-This project aims at providing a unified abstract interface to exchange data between devices using
-different technologies.
-
-Data exchanges do work as follow:
-* File exchange is done between a sender and a receiver;
-* Multiple (one or several) channels link sender and receiver;
-* Sender-side, a scheduler sends file chunks on channels as it sees fit;
-* Receiver-side, an aggregator reconstructs file from received file chunks.
+This repository holds `Receiver` and `Scheduler` class, that can be used to send/receive files 
+through channels.
 
 ## General architecture
 
