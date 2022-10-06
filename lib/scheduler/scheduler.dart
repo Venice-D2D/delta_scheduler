@@ -3,11 +3,11 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:async/async.dart';
-import 'package:channel_multiplexed_scheduler/channels/abstractions/bootstrap_channel.dart';
-import 'package:channel_multiplexed_scheduler/channels/events/data_channel_event.dart';
-import 'package:channel_multiplexed_scheduler/channels/abstractions/data_channel.dart';
-import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
-import 'package:channel_multiplexed_scheduler/file/file_metadata.dart';
+import 'package:venice_core/channels/abstractions/bootstrap_channel.dart';
+import 'package:venice_core/channels/events/data_channel_event.dart';
+import 'package:venice_core/channels/abstractions/data_channel.dart';
+import 'package:venice_core/file/file_chunk.dart';
+import 'package:venice_core/file/file_metadata.dart';
 import 'package:flutter/material.dart';
 
 

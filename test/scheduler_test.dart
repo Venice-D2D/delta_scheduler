@@ -1,7 +1,7 @@
 import 'dart:io';
 
-import 'package:channel_multiplexed_scheduler/channels/abstractions/bootstrap_channel.dart';
-import 'package:channel_multiplexed_scheduler/file/file_chunk.dart';
+import 'package:venice_core/channels/abstractions/bootstrap_channel.dart';
+import 'package:venice_core/file/file_chunk.dart';
 import 'package:channel_multiplexed_scheduler/scheduler/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
 
