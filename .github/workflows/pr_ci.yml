@@ -10,6 +10,10 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+      - name: Remove local venice_core dependency
+        run: flutter pub remove venice_core
+      - name: Install venice_core from GitHub
+        run: flutter pub add venice_core --git-url=https://github.com/Venice-D2D/venice_core
       - run: flutter pub get
       - name: Lint analysis
         run: flutter analyze
@@ -22,6 +26,10 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+      - name: Remove local venice_core dependency
+          run: flutter pub remove venice_core
+      - name: Install venice_core from GitHub
+        run: flutter pub add venice_core --git-url=https://github.com/Venice-D2D/venice_core
       - run: flutter pub get
       - name: Run tests
         run: flutter test
