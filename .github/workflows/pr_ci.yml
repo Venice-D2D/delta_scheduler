@@ -27,7 +27,7 @@ jobs:
         with:
           channel: 'stable'
       - name: Remove local venice_core dependency
-          run: flutter pub remove venice_core
+        run: flutter pub remove venice_core
       - name: Install venice_core from GitHub
         run: flutter pub add venice_core --git-url=https://github.com/Venice-D2D/venice_core
       - run: flutter pub get
