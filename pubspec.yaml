@@ -1,4 +1,4 @@
-name: channel_multiplexed_scheduler
+name: delta_scheduler
 description: A new Flutter plugin project.
 version: 0.0.1
 publish_to: none

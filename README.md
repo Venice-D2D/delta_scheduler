@@ -1,4 +1,4 @@
-# channel_multiplexed_scheduler
+# delta_scheduler
 
 This repository holds `Receiver` and `Scheduler` class, that can be used to send/receive files 
 through channels.
