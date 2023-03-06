@@ -1,7 +1,7 @@
 import 'package:async/async.dart';
 import 'package:venice_core/channels/abstractions/data_channel.dart';
 import 'package:venice_core/file/file_chunk.dart';
-import 'package:channel_multiplexed_scheduler/scheduler/scheduler.dart';
+import 'package:delta_scheduler/scheduler/scheduler.dart';
 import 'package:flutter/material.dart';
 
 
