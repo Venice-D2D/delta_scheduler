@@ -9,7 +9,6 @@ import 'package:venice_core/channels/events/data_channel_event.dart';
 import 'package:venice_core/file/file_chunk.dart';
 import 'package:flutter/material.dart';
 
-
 /// This test Channel implementation emulates a network connection by using the
 /// local file system as intermediate between sender and receiver.
 class FileDataChannel extends DataChannel {
@@ -18,22 +17,27 @@ class FileDataChannel extends DataChannel {
   // This file name is used to synchronize receiving and sending ends.
   final String receiverReadyFileName = "receiverIsReady";
 
-  FileDataChannel({required this.directory, String identifier = FileDataChannel.channelIdentifier}) : super(identifier);
+  FileDataChannel(
+      {required this.directory,
+      String identifier = FileDataChannel.channelIdentifier})
+      : super(identifier);
 
   static const String channelIdentifier = "file_data_channel";
-
 
   /// When a file is created in target directory, this reconstructs file chunk
   /// from said file and sends it to the receiver.
   @override
   Future<void> initReceiver(ChannelMetadata data) async {
-    debugPrint("[FileDataChannel][initReceiver] Start receiving end initialization.");
+    debugPrint(
+        "[FileDataChannel][initReceiver] Start receiving end initialization.");
 
     directory.watch(events: FileSystemEvent.create).listen((event) {
       // Rebuild FileChunk instance.
       File receivedChunk = File(event.path);
-
       String name = receivedChunk.uri.pathSegments.last;
+
+      // Ignore self-created files
+      if (name.startsWith('ACK')) return;
       if (name == receiverReadyFileName) return;
 
       FileChunk chunk = FileChunk(
@@ -42,6 +46,11 @@ class FileDataChannel extends DataChannel {
 
       // Send an event with received chunk as parameter.
       on(DataChannelEvent.data, chunk);
+
+      // Acknowledge chunck to sending end.
+      File chunkFile = File(
+          "${directory.path}${Platform.pathSeparator}ACK${chunk.identifier}");
+      chunkFile.createSync();
     });
 
     // Simulate delay before telling we're ready.
@@ -52,7 +61,8 @@ class FileDataChannel extends DataChannel {
     // receiver end).
     await Future.delayed(Duration(milliseconds: Random().nextInt(1000)));
     debugPrint("[FileDataChannel][initReceiver] Reception end is ready.");
-    File chunkFile = File("${directory.path}${Platform.pathSeparator}receiverIsReady");
+    File chunkFile =
+        File("${directory.path}${Platform.pathSeparator}receiverIsReady");
     chunkFile.createSync();
   }
 
@@ -63,21 +73,25 @@ class FileDataChannel extends DataChannel {
   /// directory.
   @override
   Future<void> initSender(BootstrapChannel channel) async {
-    debugPrint("[FileDataChannel][initSender] Start sending end initialization.");
+    debugPrint(
+        "[FileDataChannel][initSender] Start sending end initialization.");
     bool isReceiverReady = false;
 
-    StreamSubscription stream = directory.watch(events: FileSystemEvent.create).listen((event) {
+    StreamSubscription stream =
+        directory.watch(events: FileSystemEvent.create).listen((event) {
       File file = File(event.path);
       String name = file.uri.pathSegments.last;
       if (name == receiverReadyFileName) {
         isReceiverReady = true;
+      } else if (name.startsWith('ACK')) {
+        int identifier = int.parse(name.substring(3));
+        on(DataChannelEvent.acknowledgment, identifier);
       }
     });
 
     // Simulate sending channel information to receiving end.
-    await channel.sendChannelMetadata(
-        ChannelMetadata(identifier, "176.122.202.107", "FileDataChannel", "3d91a583")
-    );
+    await channel.sendChannelMetadata(ChannelMetadata(
+        identifier, "176.122.202.107", "FileDataChannel", "3d91a583"));
 
     // If receiver end is not ready, we wait a bit.
     await Future.doWhile(() async {
@@ -85,7 +99,6 @@ class FileDataChannel extends DataChannel {
       return !isReceiverReady;
     });
 
-    stream.cancel();
     debugPrint("[FileDataChannel][initSender] Sending end is ready.");
   }
 
@@ -93,9 +106,9 @@ class FileDataChannel extends DataChannel {
   /// as files.
   @override
   Future<void> sendChunk(FileChunk chunk) async {
-    File chunkFile = File(directory.path + Platform.pathSeparator + chunk.identifier.toString());
+    File chunkFile = File(
+        directory.path + Platform.pathSeparator + chunk.identifier.toString());
     chunkFile.createSync();
     chunkFile.writeAsBytesSync(chunk.data);
-    on(DataChannelEvent.acknowledgment, chunk.identifier);
   }
 }
