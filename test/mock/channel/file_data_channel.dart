@@ -77,8 +77,7 @@ class FileDataChannel extends DataChannel {
         "[FileDataChannel][initSender] Start sending end initialization.");
     bool isReceiverReady = false;
 
-    StreamSubscription stream =
-        directory.watch(events: FileSystemEvent.create).listen((event) {
+    directory.watch(events: FileSystemEvent.create).listen((event) {
       File file = File(event.path);
       String name = file.uri.pathSegments.last;
       if (name == receiverReadyFileName) {
