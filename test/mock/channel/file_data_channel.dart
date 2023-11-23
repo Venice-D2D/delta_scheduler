@@ -16,6 +16,7 @@ class FileDataChannel extends DataChannel {
   Directory directory;
   // This file name is used to synchronize receiving and sending ends.
   final String receiverReadyFileName = "receiverIsReady";
+  late StreamSubscription stream;
 
   FileDataChannel(
       {required this.directory,
@@ -31,7 +32,7 @@ class FileDataChannel extends DataChannel {
     debugPrint(
         "[FileDataChannel][initReceiver] Start receiving end initialization.");
 
-    directory.watch(events: FileSystemEvent.create).listen((event) {
+    stream = directory.watch(events: FileSystemEvent.create).listen((event) {
       // Rebuild FileChunk instance.
       File receivedChunk = File(event.path);
       String name = receivedChunk.uri.pathSegments.last;
@@ -77,7 +78,7 @@ class FileDataChannel extends DataChannel {
         "[FileDataChannel][initSender] Start sending end initialization.");
     bool isReceiverReady = false;
 
-    directory.watch(events: FileSystemEvent.create).listen((event) {
+    stream = directory.watch(events: FileSystemEvent.create).listen((event) {
       File file = File(event.path);
       String name = file.uri.pathSegments.last;
       if (name == receiverReadyFileName) {
@@ -109,5 +110,10 @@ class FileDataChannel extends DataChannel {
         directory.path + Platform.pathSeparator + chunk.identifier.toString());
     chunkFile.createSync();
     chunkFile.writeAsBytesSync(chunk.data);
+  }
+
+  @override
+  Future<void> close() async {
+    stream.cancel();
   }
 }

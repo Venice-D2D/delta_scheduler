@@ -47,4 +47,7 @@ class MockDataChannel extends DataChannel {
       on(DataChannelEvent.acknowledgment, chunk.identifier);
     });
   }
+
+  @override
+  Future<void> close() async {}
 }

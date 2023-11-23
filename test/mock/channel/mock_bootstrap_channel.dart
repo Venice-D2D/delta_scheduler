@@ -29,4 +29,7 @@ class MockBootstrapChannel extends BootstrapChannel {
 
   @override
   Future<void> sendFileMetadata(FileMetadata data) async {}
+
+  @override
+  Future<void> close() async {}
 }

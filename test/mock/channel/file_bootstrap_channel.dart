@@ -15,6 +15,7 @@ class FileBootstrapChannel extends BootstrapChannel {
   Directory directory;
   // This file name is used to synchronize receiving and sending ends.
   final String receiverReadyFileName = "receiverIsReady";
+  late StreamSubscription stream;
 
   FileBootstrapChannel({required this.directory});
 
@@ -22,7 +23,7 @@ class FileBootstrapChannel extends BootstrapChannel {
   @override
   Future<void> initReceiver({Map<String, dynamic> parameters = const {}}) async {
     debugPrint("[FileBootstrapChannel][initReceiver] Start receiving end initialization.");
-    directory.watch(events: FileSystemEvent.create).listen((event) async {
+    stream = directory.watch(events: FileSystemEvent.create).listen((event) async {
       File receivedPacket = File(event.path);
       String name = receivedPacket.uri.pathSegments.last;
       if (name == receiverReadyFileName) return;
@@ -66,7 +67,7 @@ class FileBootstrapChannel extends BootstrapChannel {
     debugPrint("[FileBootstrapChannel][initSender] Start sending end initialization.");
     bool isReceiverReady = false;
 
-    StreamSubscription stream = directory.watch(events: FileSystemEvent.create).listen((event) {
+    stream = directory.watch(events: FileSystemEvent.create).listen((event) {
       File file = File(event.path);
       String name = file.uri.pathSegments.last;
       if (name == receiverReadyFileName) {
@@ -108,5 +109,10 @@ class FileBootstrapChannel extends BootstrapChannel {
 
     File packetFile = File(directory.path + Platform.pathSeparator + const Uuid().v1());
     packetFile.writeAsBytesSync(utf8.encode(finalContent));
+  }
+
+  @override
+  Future<void> close() async {
+    stream.cancel();
   }
 }
