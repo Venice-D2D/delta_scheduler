@@ -1,21 +1,21 @@
 import 'dart:math';
 
-import 'package:venice_core/channels/channel_metadata.dart';
+import 'package:venice_core/metadata/channel_metadata.dart';
 import 'package:venice_core/channels/abstractions/bootstrap_channel.dart';
 import 'package:venice_core/channels/abstractions/data_channel.dart';
 import 'package:venice_core/channels/events/data_channel_event.dart';
-import 'package:venice_core/file/file_chunk.dart';
 import 'package:flutter/material.dart';
+import 'package:venice_core/network/message.dart';
 
 
 /// This is a mock Channel implementation that's used in tests.
 class MockDataChannel extends DataChannel {
-  bool shouldDropChunks;
+  bool shouldDropMessages;
   bool isInitSender = false;
   bool isInitReceiver = false;
-  List<int> sentChunksIds = [];
+  List<int> sentMessagesIds = [];
 
-  MockDataChannel({required String identifier, this.shouldDropChunks = false}) : super(identifier);
+  MockDataChannel({required String identifier, this.shouldDropMessages = false}) : super(identifier);
 
 
   @override
@@ -28,23 +28,23 @@ class MockDataChannel extends DataChannel {
     isInitReceiver = true;
   }
 
-  /// Stupid chunk sending emulation, that acknowledges a chunk after a random
+  /// Stupid message sending emulation, that acknowledges a chunk after a random
   /// delay to simulate network latency.
-  /// If shouldDropChunks is set to true, this will simulate packet drop from
+  /// If [shouldDropMessages] is set to true, this will simulate packet drop from
   /// time to time, not sending any acknowledgement at all.
   @override
-  Future<void> sendChunk(FileChunk chunk) async {
+  Future<void> sendMessage(VeniceMessage chunk) async {
     Random r = Random();
-    if (shouldDropChunks && r.nextDouble() < 0.3) {
-      debugPrint('==> [MockChannel] Dropped chunk n°${chunk.identifier}.');
+    if (shouldDropMessages && r.nextDouble() < 0.3) {
+      debugPrint('==> [MockChannel] Dropped message n°${chunk.messageId}.');
       return;
     }
 
     await Future.delayed(Duration(milliseconds: r.nextInt(2000)), () {
-      if (!sentChunksIds.contains(chunk.identifier)) {
-        sentChunksIds.add(chunk.identifier);
+      if (!sentMessagesIds.contains(chunk.messageId)) {
+        sentMessagesIds.add(chunk.messageId);
       }
-      on(DataChannelEvent.acknowledgment, chunk.identifier);
+      on(DataChannelEvent.acknowledgment, chunk.messageId);
     });
   }
 

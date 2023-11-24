@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:venice_core/channels/abstractions/bootstrap_channel.dart';
-import 'package:venice_core/file/file_chunk.dart';
 import 'package:delta_scheduler/scheduler/scheduler.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:venice_core/network/message.dart';
 
 import 'mock/channel/mock_bootstrap_channel.dart';
 import 'mock/channel/mock_data_channel.dart';
@@ -43,13 +43,13 @@ void main() {
     test("should split file into chunks", () {
       int chunksize = 1000;
 
-      List<FileChunk> chunks = scheduler.splitFile(file, chunksize);
-      expect(chunks.length, (fileLength/chunksize).ceil());
-      FileChunk lastChunk = chunks.removeLast();
+      List<VeniceMessage> messages = scheduler.splitFile(file, chunksize);
+      expect(messages.length, (fileLength/chunksize).ceil());
+      VeniceMessage lastChunk = messages.removeLast();
 
       // all chunks should have same size,
       // except the last one which might be smaller
-      for (var chunk in chunks) {
+      for (var chunk in messages) {
         expect(chunk.data.length, chunksize);
       }
       expect(lastChunk.data.length <= chunksize, true);
@@ -58,13 +58,13 @@ void main() {
     test("should not split file with negative chunk size", () {
       expect(() => scheduler.splitFile(file, -42),
           throwsA(predicate((e) => e is RangeError
-              && e.message == 'Invalid chunk size (was -42).')));
+              && e.message == 'Invalid message maximum size (was -42).')));
     });
 
     test("should not split file with empty chunk size", () {
       expect(() => scheduler.splitFile(file, 0),
           throwsA(predicate((e) => e is RangeError
-              && e.message == 'Invalid chunk size (was 0).')));
+              && e.message == 'Invalid message maximum size (was 0).')));
     });
 
     test("should not split file with chunk size bigger than file size", () {
@@ -72,12 +72,12 @@ void main() {
 
       expect(() => scheduler.splitFile(file, chunksize),
           throwsA(predicate((e) => e is RangeError
-              && e.message == 'Invalid chunk size (was $chunksize).')));
+              && e.message == 'Invalid message maximum size (was $chunksize).')));
     });
 
     test("should split file in as many chunks as file bytes", () {
-      List<FileChunk> chunks = scheduler.splitFile(file, 1);
-      expect(chunks.length, file.lengthSync());
+      List<VeniceMessage> messages = scheduler.splitFile(file, 1);
+      expect(messages.length, file.lengthSync());
     });
 
     test("should throw with non-existing file", () {
@@ -116,22 +116,22 @@ void main() {
       await scheduler.sendFile(file, 100000);
 
       // chunks are not sent in order, so we need to sort their ids
-      channel1.sentChunksIds.sort((int a, int b) => a - b);
+      channel1.sentMessagesIds.sort((int a, int b) => a - b);
 
-      expect(channel1.sentChunksIds, [0, 1, 2, 3, 4, 5, 6, 7, 8]);
-      expect(channel2.sentChunksIds.isEmpty, true);
+      expect(channel1.sentMessagesIds, [0, 1, 2, 3, 4, 5, 6, 7, 8]);
+      expect(channel2.sentMessagesIds.isEmpty, true);
     });
 
     test('should send all chunks even if some are dropped', () async {
-      MockDataChannel channel = MockDataChannel(identifier: "mock_data_channel", shouldDropChunks: true);
+      MockDataChannel channel = MockDataChannel(identifier: "mock_data_channel", shouldDropMessages: true);
 
       scheduler.useChannel(channel);
       await scheduler.sendFile(file, 100000);
 
       // chunks are not sent in order, so we need to sort their ids
-      channel.sentChunksIds.sort((int a, int b) => a - b);
+      channel.sentMessagesIds.sort((int a, int b) => a - b);
 
-      expect(channel.sentChunksIds, [0, 1, 2, 3, 4, 5, 6, 7, 8]);
+      expect(channel.sentMessagesIds, [0, 1, 2, 3, 4, 5, 6, 7, 8]);
     });
   });
 }

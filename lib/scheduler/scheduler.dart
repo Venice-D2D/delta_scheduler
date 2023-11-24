@@ -6,9 +6,9 @@ import 'package:async/async.dart';
 import 'package:venice_core/channels/abstractions/bootstrap_channel.dart';
 import 'package:venice_core/channels/events/data_channel_event.dart';
 import 'package:venice_core/channels/abstractions/data_channel.dart';
-import 'package:venice_core/file/file_chunk.dart';
-import 'package:venice_core/file/file_metadata.dart';
+import 'package:venice_core/metadata/file_metadata.dart';
 import 'package:flutter/material.dart';
+import 'package:venice_core/network/message.dart';
 
 
 /// The Scheduler class goal is to send a file to a Receiver instance that's
@@ -17,11 +17,11 @@ import 'package:flutter/material.dart';
 /// To do so, it uses multiple data channels; it is responsible for their
 /// initialization, but also in the implementation of the channel choice
 /// strategy (*i.e.* in choosing which channel to use to send a given file
-/// chunk).
+/// message).
 abstract class Scheduler {
   final BootstrapChannel bootstrapChannel;
   late final List<DataChannel> _channels = [];
-  late List<FileChunk> _chunksQueue = [];
+  late List<VeniceMessage> _messagesQueue = [];
   final Map<int, CancelableOperation> _resubmissionTimers = {};
 
   Scheduler(this.bootstrapChannel);
@@ -37,9 +37,9 @@ abstract class Scheduler {
     channel.on = (DataChannelEvent event, dynamic data) {
       switch (event) {
         case DataChannelEvent.acknowledgment:
-          int chunkId = data;
-          if (_resubmissionTimers.containsKey(chunkId)) {
-            CancelableOperation timer = _resubmissionTimers.remove(chunkId)!;
+          int msgId = data;
+          if (_resubmissionTimers.containsKey(msgId)) {
+            CancelableOperation timer = _resubmissionTimers.remove(msgId)!;
             timer.cancel();
           }
           break;
@@ -49,107 +49,106 @@ abstract class Scheduler {
     };
   }
 
-  /// Sends file chunks through available channels.
+  /// Sends a file through available channels.
   ///
-  /// While there are chunks to send, it unstacks them one by one, and choose
+  /// While there are messages to send, it unstacks them one by one, and choose
   /// a channel to send them.
   ///
-  /// When sending a chunk, this registers a timeout callback, that triggers
-  /// resending chunk if channel didn't send an acknowledgement.
-  Future<void> sendFile(File file, int chunksize) async {
+  /// When sending a message, this registers a timeout callback, that triggers
+  /// resending messages if channel didn't send an acknowledgement.
+  Future<void> sendFile(File file, int msgMaxSize) async {
     if (_channels.isEmpty) {
       throw StateError('Cannot send file because scheduler has no channel.');
     }
 
-    _chunksQueue = splitFile(file, chunksize);
+    _messagesQueue = splitFile(file, msgMaxSize);
 
     // Open bootstrap channel and send file metadata.
     await bootstrapChannel.initSender();
     await bootstrapChannel.sendFileMetadata(
-        FileMetadata(file.uri.pathSegments.last, chunksize, _chunksQueue.length)
+        FileMetadata(file.uri.pathSegments.last, msgMaxSize, _messagesQueue.length)
     );
     
     // Open all channels.
     await Future.wait(_channels.map((c) => c.initSender( bootstrapChannel )));
     debugPrint("[Scheduler] All data channels are ready, data sending can start.\n");
 
-    // Begin sending chunks.
-    await sendChunks(_chunksQueue, _channels, _resubmissionTimers);
+    // Begin sending messages.
+    await sendMessages(_messagesQueue, _channels, _resubmissionTimers);
   }
 
-  /// This lets Scheduler instances implement their own chunks sending policy.
+  /// This lets Scheduler instances implement their own message sending policy.
   /// 
-  /// The implementation should send all chunks' content, by calling the 
-  /// sendChunk method; it can also check for any resubmission timer presence, 
-  /// to avoid finishing execution while some chunks have not been acknowledged.
-  Future<void> sendChunks(
-      List<FileChunk> chunks,
+  /// The implementation should send all messages' content, by calling the 
+  /// sendMessage method; it can also check for any resubmission timer presence, 
+  /// to avoid finishing execution while some messages have not been
+  /// acknowledged.
+  Future<void> sendMessages(
+      List<VeniceMessage> messages,
       List<DataChannel> channels,
       Map<int, CancelableOperation> resubmissionTimers);
 
-  /// Sends a data chunk through a specified channel.
+  /// Sends a message through a specified channel.
   /// 
-  /// If such chunk is not acknowledged within a given duration, this will put
-  /// the chunk at the head of the sending queue, for it to be resent as soon
+  /// If such message is not acknowledged within a given duration, this will put
+  /// the message at the head of the sending queue, for it to be resent as soon
   /// as possible.
-  Future<void> sendChunk(FileChunk chunk, DataChannel channel) async {
+  Future<void> sendMessage(VeniceMessage msg, DataChannel channel) async {
     bool acknowledged = false;
     bool timedOut = false;
 
     _resubmissionTimers.putIfAbsent(
-        chunk.identifier,
+        msg.messageId,
             () => CancelableOperation.fromFuture(
             Future.delayed(const Duration(seconds: 1), () {
-              // Do not trigger chunk resending if it was previously
+              // Do not trigger message resending if it was previously
               // acknowledged.
               if (acknowledged) return;
-              debugPrint("[Scheduler] Chunk n°${chunk.identifier} was not acknowledged in time, resending.");
-              CancelableOperation timer = _resubmissionTimers.remove(chunk.identifier)!;
+              debugPrint("[Scheduler] Message n°${msg.messageId} was not acknowledged in time, resending.");
+              CancelableOperation timer = _resubmissionTimers.remove(msg.messageId)!;
               timedOut = true;
               timer.cancel();
-              _chunksQueue.insert(0, chunk);
+              _messagesQueue.insert(0, msg);
             }),
               onCancel: () {
                 // Do not print message if onCancel was called due to request
                 // timeout.
                 if (timedOut) return;
                 acknowledged = true;
-                debugPrint('[Scheduler] Chunk n°${chunk.identifier} was acknowledged.');
+                debugPrint('[Scheduler] Message n°${msg.messageId} was acknowledged.');
               }
         )
     );
 
-    debugPrint("[Scheduler] Sending chunk n°${chunk.identifier}.");
-    await channel.sendChunk(chunk);
+    debugPrint("[Scheduler] Sending message n°${msg.messageId}.");
+    await channel.sendMessage(msg);
   }
 
-  /// Divides an input file into chunks of *chunksize* size.
-  /// This will fail if input file is not accessible, or if input chunk size is
+  /// Divides an input file into messages of [maxSize] size.
+  /// This will fail if input file is not accessible, or if input size is
   /// invalid.
-  List<FileChunk> splitFile (File file, int chunksize) {
+  List<VeniceMessage> splitFile (File file, int maxSize) {
     if (!file.existsSync()) {
       throw RangeError('Invalid input file (path="${file.path}").');
     }
 
     Uint8List bytes = file.readAsBytesSync();
-    List<FileChunk> chunks = [];
+    List<VeniceMessage> messages = [];
     int bytesCount = bytes.length;
     int index = 0;
 
-    if (chunksize <= 0 || chunksize > bytesCount) {
-      throw RangeError('Invalid chunk size (was $chunksize).');
+    if (maxSize <= 0 || maxSize > bytesCount) {
+      throw RangeError('Invalid message maximum size (was $maxSize).');
     }
 
-    for (int i=0; i<bytesCount; i += chunksize) {
-      chunks.add(FileChunk(
-          identifier: index,
-          data: bytes.sublist(i, i + chunksize > bytesCount
-              ? bytesCount
-              : i + chunksize)
-      ));
+    for (int i=0; i<bytesCount; i += maxSize) {
+      Uint8List data = bytes.sublist(i, i + maxSize > bytesCount
+          ? bytesCount
+          : i + maxSize);
+      messages.add(VeniceMessage.data(index, data));
       index += 1;
     }
 
-    return chunks;
+    return messages;
   }
 }

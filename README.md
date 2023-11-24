@@ -44,18 +44,18 @@ To implement your scheduler, you must extend the `Scheduler` class, which contai
 for you to implement:
 
 ```dart
-/// This lets Scheduler instances implement their own chunks sending policy.
+/// This lets Scheduler instances implement their own messages sending policy.
 /// 
-/// The implementation should send all chunks' content, by calling the 
-/// sendChunk method; it can also check for any resubmission timer presence, 
-/// to avoid finishing execution while some chunks have not been acknowledged.
-Future<void> sendChunks(
-  List<FileChunk> chunks,
+/// The implementation should send all messages' content, by calling the 
+/// sendMessage method; it can also check for any resubmission timer presence, 
+/// to avoid finishing execution while some messages have not been acknowledged.
+Future<void> sendMessages(
+  List<VeniceMessage> messages,
   List<Channel> channels,
   Map<int, CancelableOperation> resubmissionTimers);
 ```
 
-Your `sendChunks` implementation must send all `chunks` through available `channels`; the 
+Your `sendMessages` implementation must send all `messages` through available `channels`; the 
 `resubmissionTimers` variable holds delays until a chunk is considered as not-transmitted, and must
 be sent again; timers handling is done by the `Scheduler` class itself (*i.e. don't touch it*), but 
 you can still check its content (like `tests/mock/scheduler/MockScheduler` does) to ensure all

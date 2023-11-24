@@ -1,12 +1,12 @@
 import 'dart:io';
 
-import 'package:venice_core/channels/channel_metadata.dart';
+import 'package:venice_core/metadata/channel_metadata.dart';
 import 'package:venice_core/channels/events/bootstrap_channel_event.dart';
 import 'package:venice_core/channels/abstractions/bootstrap_channel.dart';
 import 'package:venice_core/channels/events/data_channel_event.dart';
 import 'package:venice_core/channels/abstractions/data_channel.dart';
-import 'package:venice_core/file/file_chunk.dart';
-import 'package:venice_core/file/file_metadata.dart';
+import 'package:venice_core/metadata/file_metadata.dart';
+import 'package:venice_core/network/message.dart';
 
 
 /// The Receiver class goal is to receive a file from a Scheduler instance
@@ -14,11 +14,11 @@ import 'package:venice_core/file/file_metadata.dart';
 class Receiver {
   final BootstrapChannel bootstrapChannel;
   late final List<DataChannel> _channels = [];
-  final Map<int, FileChunk> _chunks = {};
+  final Map<int, VeniceMessage> _messages = {};
 
-  /// Number of chunks we expect to receive.
+  /// Number of messages we expect to receive.
   /// Receiver will not end while it has not received expected chunks count.
-  late int _chunksCount;
+  late int _messagesCount;
 
   /// Name of the file that will be created by the received.
   /// It is transmitted through the bootstrap channel.
@@ -35,8 +35,8 @@ class Receiver {
     
     _channels.add(channel);
     channel.on = (DataChannelEvent event, dynamic data) {
-      FileChunk chunk = data;
-      _chunks.putIfAbsent(chunk.identifier, () => chunk);
+      VeniceMessage chunk = data;
+      _messages.putIfAbsent(chunk.messageId, () => chunk);
     };
   }
 
@@ -62,7 +62,7 @@ class Receiver {
           // TODO use chunk size
           FileMetadata fileMetadata = data;
           _filename = fileMetadata.name;
-          _chunksCount = fileMetadata.chunkCount;
+          _messagesCount = fileMetadata.chunkCount;
           fileMetadataReceived = true;
           break;
         case BootstrapChannelEvent.channelMetadata:
@@ -95,23 +95,23 @@ class Receiver {
       await Future.delayed(const Duration(milliseconds: 100));
     }
 
-    // Wait for all chunks to arrive.
-    await receiveAllChunks();
+    // Wait for all messages to arrive.
+    await receiveAllMessages();
 
-    // Fill destination file with received chunks.
+    // Fill destination file with received messages.
     File newFile = File(destination.path+Platform.pathSeparator+_filename);
     if (newFile.existsSync()) {
       newFile.deleteSync();
     }
     newFile.createSync();
-    for (var chunk in _chunks.values) {
-      newFile.writeAsBytesSync(chunk.data, mode: FileMode.append);
+    for (var msg in _messages.values) {
+      newFile.writeAsBytesSync(msg.data, mode: FileMode.append);
     }
   }
 
 
-  Future<void> receiveAllChunks() async {
-    while (_chunks.length != _chunksCount) {
+  Future<void> receiveAllMessages() async {
+    while (_messages.length != _messagesCount) {
       await Future.delayed(const Duration(milliseconds: 200));
     }
   }

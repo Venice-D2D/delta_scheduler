@@ -2,12 +2,12 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
-import 'package:venice_core/channels/channel_metadata.dart';
+import 'package:venice_core/metadata/channel_metadata.dart';
 import 'package:venice_core/channels/abstractions/bootstrap_channel.dart';
 import 'package:venice_core/channels/abstractions/data_channel.dart';
 import 'package:venice_core/channels/events/data_channel_event.dart';
-import 'package:venice_core/file/file_chunk.dart';
 import 'package:flutter/material.dart';
+import 'package:venice_core/network/message.dart';
 
 /// This test Channel implementation emulates a network connection by using the
 /// local file system as intermediate between sender and receiver.
@@ -41,16 +41,16 @@ class FileDataChannel extends DataChannel {
       if (name.startsWith('ACK')) return;
       if (name == receiverReadyFileName) return;
 
-      FileChunk chunk = FileChunk(
-          identifier: int.parse(receivedChunk.uri.pathSegments.last),
-          data: receivedChunk.readAsBytesSync());
+      VeniceMessage chunk = VeniceMessage.data(
+          int.parse(receivedChunk.uri.pathSegments.last),
+          receivedChunk.readAsBytesSync());
 
       // Send an event with received chunk as parameter.
       on(DataChannelEvent.data, chunk);
 
       // Acknowledge chunck to sending end.
       File chunkFile = File(
-          "${directory.path}${Platform.pathSeparator}ACK${chunk.identifier}");
+          "${directory.path}${Platform.pathSeparator}ACK${chunk.messageId}");
       chunkFile.createSync();
     });
 
@@ -105,9 +105,9 @@ class FileDataChannel extends DataChannel {
   /// Simulates sending chunks over network by writing them down in a directory
   /// as files.
   @override
-  Future<void> sendChunk(FileChunk chunk) async {
+  Future<void> sendMessage(VeniceMessage chunk) async {
     File chunkFile = File(
-        directory.path + Platform.pathSeparator + chunk.identifier.toString());
+        directory.path + Platform.pathSeparator + chunk.messageId.toString());
     chunkFile.createSync();
     chunkFile.writeAsBytesSync(chunk.data);
   }
