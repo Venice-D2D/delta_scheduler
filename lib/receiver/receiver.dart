@@ -7,6 +7,7 @@ import 'package:venice_core/channels/events/data_channel_event.dart';
 import 'package:venice_core/channels/abstractions/data_channel.dart';
 import 'package:venice_core/metadata/file_metadata.dart';
 import 'package:venice_core/network/message.dart';
+import 'package:flutter/material.dart';
 
 
 /// The Receiver class goal is to receive a file from a Scheduler instance
@@ -105,7 +106,9 @@ class Receiver {
     }
     newFile.createSync();
     for (var msg in _messages.values) {
+      debugPrint('[Receiver] Message n°${msg.messageId} used to create the file.');
       newFile.writeAsBytesSync(msg.data, mode: FileMode.append);
+
     }
   }
 
