@@ -15,14 +15,14 @@ class MockBootstrapChannel extends BootstrapChannel {
 
   @override
   Future<void> initReceiver({Map<String, dynamic> parameters = const {}}) async {
-    on(BootstrapChannelEvent.channelMetadata, ChannelMetadata(mockChannelId1, "address", "identifier", "password"));
+    on(BootstrapChannelEvent.channelMetadata, ChannelMetadata(mockChannelId1, "address", "identifier", "password", 1010));
     if (dataChannelsCount == 2) {
-      on(BootstrapChannelEvent.channelMetadata, ChannelMetadata(mockChannelId2, "address2", "identifier2", "password2"));
+      on(BootstrapChannelEvent.channelMetadata, ChannelMetadata(mockChannelId2, "address2", "identifier2", "password2", 1020));
     }
   }
 
   @override
-  Future<void> initSender({data = const {}}) async {}
+  Future<void> initSender(FileMetadata fileMetadata, ChannelMetadata channelData) async {}
 
   @override
   Future<void> sendChannelMetadata(ChannelMetadata data) async {}

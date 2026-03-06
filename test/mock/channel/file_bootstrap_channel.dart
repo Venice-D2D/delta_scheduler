@@ -40,7 +40,7 @@ class FileBootstrapChannel extends BootstrapChannel {
       }
 
       if (indicator == "c") {
-        ChannelMetadata data = ChannelMetadata(words[1], words[2], words[3], words[4]);
+        ChannelMetadata data = ChannelMetadata(words[1], words[2], words[3], words[4], 1010);
         debugPrint("[FileBootstrapChannel][receiver] Received channel metadata: \"$data\".");
         on(BootstrapChannelEvent.channelMetadata, data);
       } else {
@@ -63,7 +63,7 @@ class FileBootstrapChannel extends BootstrapChannel {
   }
 
   @override
-  Future<void> initSender({data = const {}}) async {
+  Future<void> initSender(FileMetadata fileMetadata, ChannelMetadata channelData) async {
     debugPrint("[FileBootstrapChannel][initSender] Start sending end initialization.");
     bool isReceiverReady = false;
 

@@ -23,7 +23,7 @@ void main() {
     // Initialize both channels.
     await Future.wait([
       bootstrapReceivingChannel.initReceiver(),
-      bootstrapSendingChannel.initSender()
+      bootstrapSendingChannel.initSender(FileMetadata("vacation_picture.png", 100000, 3), ChannelMetadata("", "", "", "", -1))
     ]);
   });
 
@@ -51,8 +51,8 @@ void main() {
   });
 
   test("should exchange channel data between sending and receiving ends", () async {
-    ChannelMetadata sentData1 = ChannelMetadata("phantom_channel", "address", "identifier", "password");
-    ChannelMetadata sentData2 = ChannelMetadata("phantom_channel", "address2", "identifier2", "password2");
+    ChannelMetadata sentData1 = ChannelMetadata("phantom_channel", "address", "identifier", "password", 1010);
+    ChannelMetadata sentData2 = ChannelMetadata("phantom_channel", "address2", "identifier2", "password2", 1020);
     bool received1 = false;
     bool received2 = false;
 
