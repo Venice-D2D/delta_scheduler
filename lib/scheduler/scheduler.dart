@@ -65,23 +65,23 @@ abstract class Scheduler {
 
     // Open all channels.
     await Future.wait(_channels.map((c) => c.initSender( bootstrapChannel )));
-    debugPrint("[Scheduler] All data channels are ready, data sending can start.\n");
+    debugPrint("[Scheduler::sendFile] All data channels are ready, data sending can start.\n");
 
     // Open bootstrap channel and send file metadata.
     FileMetadata fileData = FileMetadata(file.uri.pathSegments.last, msgMaxSize, _messagesQueue.length);
     ChannelMetadata channelData = _channels[_channels.length-1].data; // TODO How to select Data Channel ?
-    debugPrint("[Scheduler] Init Sender.\n");
+    debugPrint("[Scheduler::sendFile] Init Sender.\n");
     await bootstrapChannel.initSender(fileData, channelData);
-    debugPrint("[Scheduler] Init Sender done.\n");
-    debugPrint("[Scheduler] Dealing with client connections in data channels.\n");
+    debugPrint("[Scheduler::sendFile] Init Sender done.\n");
+    debugPrint("[Scheduler::sendFile] Dealing with client connections in data channels.\n");
     await Future.wait(_channels.map((c) => c.dealWithClientConnections()));
-    debugPrint("[Scheduler] Sending File metadata.\n"); // TODO This is not longer necessary ??
+    debugPrint("[Scheduler::sendFile] Sending File metadata.\n"); // TODO This is not longer necessary ??
     await bootstrapChannel.sendFileMetadata(fileData);
 
     // Begin sending messages.
-    debugPrint("[Scheduler] Sending File messages.\n");
+    debugPrint("[Scheduler::sendFile] Sending File messages.\n");
     await sendMessages(_messagesQueue, _channels, _resubmissionTimers);
-    debugPrint("[Scheduler] File messages sent.\n");
+    debugPrint("[Scheduler::sendFile] File messages sent.\n");
   }
 
   /// This lets Scheduler instances implement their own message sending policy.
@@ -111,7 +111,7 @@ abstract class Scheduler {
               // Do not trigger message resending if it was previously
               // acknowledged.
               if (acknowledged) return;
-              debugPrint("[Scheduler] Message n°${msg.messageId} was not acknowledged in time, resending.");
+              debugPrint("[Scheduler::sendMessage] Message n°${msg.messageId} was not acknowledged in time, resending.");
               CancelableOperation timer = _resubmissionTimers.remove(msg.messageId)!;
               timedOut = true;
               timer.cancel();
@@ -122,7 +122,7 @@ abstract class Scheduler {
                 // timeout.
                 if (timedOut) return;
                 acknowledged = true;
-                debugPrint('[Scheduler] Message n°${msg.messageId} was acknowledged.');
+                debugPrint('[Scheduler::sendMessage] Message n°${msg.messageId} was acknowledged.');
               }
         )
     );
