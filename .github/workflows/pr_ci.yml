@@ -22,6 +22,7 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: 'stable'
+          submodules: recursive
       - run: flutter pub get
       - name: Run tests
         run: flutter test
