@@ -25,6 +25,11 @@ jobs:
         with:
           channel: 'stable'
       - run: flutter pub get
-      - run: find ~/.pub-cache/git -type d -name ".git" | while read d; do repo=$(dirname "$d") git -C "$repo" submodule update --init --recursive || true done
+      - name: Init submodules in pub cache
+        run: |
+              find ~/.pub-cache/git -name ".git" -type d -exec sh -c '
+                   repo=$(dirname "$1")
+                   git -C "$repo" submodule update --init --recursive || true
+              ' _ {} \;
       - name: Run tests
         run: flutter test
