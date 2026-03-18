@@ -31,8 +31,8 @@ class FileBootstrapChannel extends BootstrapChannel {
       String content = await receivedPacket.readAsString();
       List<String> words = content.split(";");
       final String indicator = words[0];
-
-      if (![4, 5].contains(words.length)) {
+      debugPrint("[FileBootstrapChannel::initReceiver] $words");
+      if (![4, 6].contains(words.length)) {
         throw StateError("Received mock packet with incorrect format.");
       }
       if (!["c", "f"].contains(indicator)) {
@@ -40,7 +40,7 @@ class FileBootstrapChannel extends BootstrapChannel {
       }
 
       if (indicator == "c") {
-        ChannelMetadata data = ChannelMetadata(words[1], words[2], words[3], words[4], 1010);
+        ChannelMetadata data = ChannelMetadata(words[1], words[2], words[3], words[4], int.parse(words[5]));
         debugPrint("[FileBootstrapChannel][receiver] Received channel metadata: \"$data\".");
         on(BootstrapChannelEvent.channelMetadata, data);
       } else {
