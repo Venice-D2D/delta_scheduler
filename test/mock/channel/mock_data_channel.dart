@@ -52,8 +52,8 @@ class MockDataChannel extends DataChannel {
   Future<void> close() async {}
 
   @override
-  Future<void> dealWithClientConnections() {
+  Future<void> dealWithClientConnections() async {
     // TODO: implement dealWithClientConnections
-    throw UnimplementedError();
+    debugPrint('==> [MockChannel::dealWithClientConnections] Dealing with client connections');
   }
 }
