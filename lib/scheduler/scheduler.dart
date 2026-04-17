@@ -70,7 +70,7 @@ abstract class Scheduler {
     // Open bootstrap channel and send file metadata.
     FileMetadata fileData = FileMetadata(file.uri.pathSegments.last, msgMaxSize, _messagesQueue.length);
     ChannelMetadata channelData = _channels[_channels.length-1].data; // TODO How to select Data Channel ?
-    debugPrint("[Scheduler::sendFile] Init Sender.\n");
+    debugPrint("[Scheduler::sendFile] Init Sender boostrapChannel.\n");
     await bootstrapChannel.initSender(fileData, channelData);
     debugPrint("[Scheduler::sendFile] Init Sender done.\n");
     debugPrint("[Scheduler::sendFile] Dealing with client connections in data channels.\n");

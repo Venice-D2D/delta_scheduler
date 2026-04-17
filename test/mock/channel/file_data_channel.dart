@@ -90,8 +90,9 @@ class FileDataChannel extends DataChannel {
     });
 
     // Simulate sending channel information to receiving end.
-    await channel.sendChannelMetadata(ChannelMetadata(
-        identifier, "176.122.202.107", "FileDataChannel", "3d91a583", 10101));
+    data = ChannelMetadata(
+        identifier, "176.122.202.107", "FileDataChannel", "3d91a583", 10101);
+    await channel.sendChannelMetadata(data);
 
     // If receiver end is not ready, we wait a bit.
     await Future.doWhile(() async {
@@ -118,8 +119,7 @@ class FileDataChannel extends DataChannel {
   }
 
   @override
-  Future<void> dealWithClientConnections() {
+  Future<void> dealWithClientConnections() async {
     // TODO: implement dealWithClientConnections
-    throw UnimplementedError();
   }
 }

@@ -18,10 +18,11 @@ class MockScheduler extends Scheduler {
       if (chunks.isEmpty) {
         await Future.delayed(const Duration(milliseconds: 200));
       } else {
+        debugPrint('[MockScheduler::sendMessages] Sending chunk...');
         sendMessage(chunks.removeAt(0), channels[0]);
       }
     }
 
-    debugPrint('[Scheduler] Finished dispatching all chunks to channels.');
+    debugPrint('[MockScheduler::sendMessages] Finished dispatching all chunks to channels.');
   }
 }
