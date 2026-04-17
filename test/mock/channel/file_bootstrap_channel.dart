@@ -65,36 +65,10 @@ class FileBootstrapChannel extends BootstrapChannel {
   @override
   Future<void> initSender(FileMetadata fileMetadata, ChannelMetadata channelData) async {
     debugPrint("[FileBootstrapChannel][initSender] Start sending end initialization.");
-    //bool isReceiverReady = false;
 
     _createMockPacket(channelData, true);
-
-
-    /*stream = directory.watch(events: FileSystemEvent.create).listen((event) {
-      debugPrint("[FileBootstrapChannel][initSender] Event received $event");
-      File file = File(event.path);
-      String name = file.uri.pathSegments.last;
-      if (name == receiverReadyFileName) {
-        debugPrint("[FileBootstrapChannel][initSender] Get expected file: $name");
-        isReceiverReady = true;
-      }
-      else{
-        debugPrint("[FileBootstrapChannel][initSender] Expected File: $receiverReadyFileName but get file: $name");
-      }
-
-    });*/
-
-
-
-    // If receiver end is not ready, we wait a bit.
-    /*await Future.doWhile(() async {
-      await Future.delayed(Duration(milliseconds: isReceiverReady ? 0 : 200));
-      return !isReceiverReady;
-    });*/
-
     _createMockPacket(fileMetadata, false);
 
-    //stream.cancel();
     debugPrint("[FileBootstrapChannel][initSender] Sending end is ready.");
   }
 

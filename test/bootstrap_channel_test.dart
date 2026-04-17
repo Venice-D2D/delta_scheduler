@@ -29,9 +29,6 @@ void main() {
 
     // When receiving packet, check if contained data is correct.
     bootstrapReceivingChannel.on = (BootstrapChannelEvent event, dynamic data) {
-      /*if (data is! FileMetadata) {
-        throw TestFailure("Received data that is not of FileMetadata type.");
-      }*/
 
       if(data is FileMetadata){
         FileMetadata receivedData = data;
@@ -67,9 +64,6 @@ void main() {
 
     // When receiving packet, check if contained data is correct.
     bootstrapReceivingChannel.on = (BootstrapChannelEvent event, dynamic data) {
-      /*if (data is! ChannelMetadata) {
-        throw TestFailure("Received data that is not of ChannelMetadata type.");
-      }*/
 
       if(data is ChannelMetadata){
         ChannelMetadata receivedData = data;
