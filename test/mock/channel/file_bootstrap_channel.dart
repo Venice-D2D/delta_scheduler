@@ -65,7 +65,7 @@ class FileBootstrapChannel extends BootstrapChannel {
   @override
   Future<void> initSender(FileMetadata fileMetadata, ChannelMetadata channelData) async {
     debugPrint("[FileBootstrapChannel][initSender] Start sending end initialization.");
-    bool isReceiverReady = false;
+    //bool isReceiverReady = false;
 
     _createMockPacket(channelData, true);
 
