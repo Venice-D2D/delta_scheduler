@@ -20,11 +20,7 @@ void main() {
     bootstrapSendingChannel = FileBootstrapChannel( directory: chunksFilesDir );
     bootstrapReceivingChannel = FileBootstrapChannel( directory: chunksFilesDir );
 
-    // Initialize both channels.
-    await Future.wait([
-      bootstrapReceivingChannel.initReceiver(),
-      bootstrapSendingChannel.initSender()
-    ]);
+
   });
 
   test("should exchange file data between sending and receiving ends", () async {
@@ -33,13 +29,23 @@ void main() {
 
     // When receiving packet, check if contained data is correct.
     bootstrapReceivingChannel.on = (BootstrapChannelEvent event, dynamic data) {
-      if (data is! FileMetadata) {
-        throw TestFailure("Received data that is not of FileMetadata type.");
+
+      if(data is FileMetadata){
+        FileMetadata receivedData = data;
+        expect(receivedData, sentData);
+        received = true;
       }
-      FileMetadata receivedData = data;
-      expect(receivedData, sentData);
-      received = true;
+
     };
+
+    // Initialize both channels.
+    // The bootstrapReceivingChannel.on needs to be initiated before calling initReceiver
+    await Future.wait([
+      bootstrapReceivingChannel.initReceiver(),
+      bootstrapSendingChannel.initSender(FileMetadata("vacation_picture.png", 100000, 3), ChannelMetadata("", "", "", "", -1))
+    ]);
+
+
 
     // Send test packet.
     await bootstrapSendingChannel.sendFileMetadata(sentData);
@@ -51,25 +57,34 @@ void main() {
   });
 
   test("should exchange channel data between sending and receiving ends", () async {
-    ChannelMetadata sentData1 = ChannelMetadata("phantom_channel", "address", "identifier", "password");
-    ChannelMetadata sentData2 = ChannelMetadata("phantom_channel", "address2", "identifier2", "password2");
+    ChannelMetadata sentData1 = ChannelMetadata("phantom_channel", "address", "identifier", "password", 1010);
+    ChannelMetadata sentData2 = ChannelMetadata("phantom_channel", "address2", "identifier2", "password2", 1020);
     bool received1 = false;
     bool received2 = false;
 
     // When receiving packet, check if contained data is correct.
     bootstrapReceivingChannel.on = (BootstrapChannelEvent event, dynamic data) {
-      if (data is! ChannelMetadata) {
-        throw TestFailure("Received data that is not of ChannelMetadata type.");
+
+      if(data is ChannelMetadata){
+        ChannelMetadata receivedData = data;
+        if (receivedData.apIdentifier == "identifier") {
+          expect(receivedData, sentData1);
+          received1 = true;
+        } else {
+          expect(receivedData, sentData2);
+          received2 = true;
+        }
+
       }
-      ChannelMetadata receivedData = data;
-      if (receivedData.apIdentifier == "identifier") {
-        expect(receivedData, sentData1);
-        received1 = true;
-      } else {
-        expect(receivedData, sentData2);
-        received2 = true;
-      }
+
     };
+
+    // Initialize both channels.
+    // The bootstrapReceivingChannel.on needs to be initiated before calling initReceiver
+    await Future.wait([
+      bootstrapReceivingChannel.initReceiver(),
+      bootstrapSendingChannel.initSender(FileMetadata("vacation_picture.png", 100000, 3), sentData1)
+    ]);
 
     // Send test packets.
     bootstrapSendingChannel.sendChannelMetadata(sentData1);

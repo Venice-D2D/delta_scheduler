@@ -6,6 +6,7 @@ import 'package:async/async.dart';
 import 'package:venice_core/channels/abstractions/bootstrap_channel.dart';
 import 'package:venice_core/channels/events/data_channel_event.dart';
 import 'package:venice_core/channels/abstractions/data_channel.dart';
+import 'package:venice_core/metadata/channel_metadata.dart';
 import 'package:venice_core/metadata/file_metadata.dart';
 import 'package:flutter/material.dart';
 import 'package:venice_core/network/message.dart';
@@ -25,7 +26,6 @@ abstract class Scheduler {
   final Map<int, CancelableOperation> _resubmissionTimers = {};
 
   Scheduler(this.bootstrapChannel);
-
 
   /// Adds a channel to be used to send file chunks.
   void useChannel(DataChannel channel) {
@@ -63,18 +63,25 @@ abstract class Scheduler {
 
     _messagesQueue = splitFile(file, msgMaxSize);
 
-    // Open bootstrap channel and send file metadata.
-    await bootstrapChannel.initSender();
-    await bootstrapChannel.sendFileMetadata(
-        FileMetadata(file.uri.pathSegments.last, msgMaxSize, _messagesQueue.length)
-    );
-    
     // Open all channels.
     await Future.wait(_channels.map((c) => c.initSender( bootstrapChannel )));
-    debugPrint("[Scheduler] All data channels are ready, data sending can start.\n");
+    debugPrint("[Scheduler::sendFile] All data channels are ready, data sending can start.\n");
+
+    // Open bootstrap channel and send file metadata.
+    FileMetadata fileData = FileMetadata(file.uri.pathSegments.last, msgMaxSize, _messagesQueue.length);
+    ChannelMetadata channelData = _channels[_channels.length-1].data; // TODO How to select Data Channel ?
+    debugPrint("[Scheduler::sendFile] Init Sender boostrapChannel.\n");
+    await bootstrapChannel.initSender(fileData, channelData);
+    debugPrint("[Scheduler::sendFile] Init Sender done.\n");
+    debugPrint("[Scheduler::sendFile] Dealing with client connections in data channels.\n");
+    await Future.wait(_channels.map((c) => c.dealWithClientConnections()));
+    debugPrint("[Scheduler::sendFile] Sending File metadata.\n"); // TODO This is not longer necessary ??
+    await bootstrapChannel.sendFileMetadata(fileData);
 
     // Begin sending messages.
+    debugPrint("[Scheduler::sendFile] Sending File messages.\n");
     await sendMessages(_messagesQueue, _channels, _resubmissionTimers);
+    debugPrint("[Scheduler::sendFile] File messages sent.\n");
   }
 
   /// This lets Scheduler instances implement their own message sending policy.
@@ -104,7 +111,7 @@ abstract class Scheduler {
               // Do not trigger message resending if it was previously
               // acknowledged.
               if (acknowledged) return;
-              debugPrint("[Scheduler] Message n°${msg.messageId} was not acknowledged in time, resending.");
+              debugPrint("[Scheduler::sendMessage] Message n°${msg.messageId} was not acknowledged in time, resending.");
               CancelableOperation timer = _resubmissionTimers.remove(msg.messageId)!;
               timedOut = true;
               timer.cancel();
@@ -115,7 +122,7 @@ abstract class Scheduler {
                 // timeout.
                 if (timedOut) return;
                 acknowledged = true;
-                debugPrint('[Scheduler] Message n°${msg.messageId} was acknowledged.');
+                debugPrint('[Scheduler::sendMessage] Message n°${msg.messageId} was acknowledged.');
               }
         )
     );
